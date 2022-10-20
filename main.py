@@ -38,31 +38,26 @@ menubar.add_cascade(label="Help", menu=helpmenu)
 root.config(menu=menubar)
 
 
-frame = Frame( root, width=600, height=400 )
+frame = Frame( root, width=800, height=600 )
 frame.pack()
 frame.place( anchor='center', relx=0.5, rely=0.5 )
 
+# labelNome = Label( frame, text="Joe da Silva", font="Arial 16" )
+# labelNome.pack(fill=X, anchor=NW, expand=True)
+# labelRA = Label( frame, text="RA: 654651445141", font="Arial 16" )
+# labelRA.pack(fill=X, anchor=NW, expand=True)
 
 labelDescrip = Label( frame, text="Searching...", font="Arial 16", fg="Yellow" )
 labelDescrip.config( bg="#cca01d" )
-# labelDescrip = Label( frame, text="Success", font="Arial 16", fg="#08ee33" )
+# labelDescrip = Label( frame, text="Success", font="Arial 16", fg="white" )
 # labelDescrip.config(bg="#1f4a1b")
 # labelDescrip = Label( frame, text="Error!", font="Arial 16", fg="red" )
 # labelDescrip.config(bg="#8a3d3d")
 
 labelDescrip.pack(fill=X, anchor=NW, expand=True)
 
-image = Image.open("victor1.jpg")
-newHeight = image.height
-newWidth = image.width
+img = frm.loadImage("victor1_cam.jpg")
 
-if( image.width > 600 ):
-   tmpPercent = 600 / image.width
-   newWidth = 600
-   newHeight = tmpPercent * newHeight
-
-image = image.resize((newWidth, int(newHeight)))
-img = ImageTk.PhotoImage(image)
 
 label = Label(frame, image = img)
 label.pack()
