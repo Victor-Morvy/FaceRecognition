@@ -5,7 +5,9 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
-import frm.FrmAdmin as frm
+# import frm.FrmAdmin as frm
+import frm.utils as utils
+import frm.FrmAdmin as frmAdmin
 
 def donothing():
    x = 0
@@ -16,9 +18,10 @@ root.title("Presença de alunos")
 root.config( bg="white" )
 root.geometry( '1024x862' )
 
+window = {}
 
 def openAdmin():
-   window = frm.FrmAdmin( root )
+   window = frmAdmin.FrmAdmin( root )
    window.grab_set()
 
 menubar = Menu(root)
@@ -56,12 +59,13 @@ labelDescrip.config( bg="#cca01d" )
 
 labelDescrip.pack(fill=X, anchor=NW, expand=True)
 
-img = frm.loadImage("victor1_cam.jpg")
+img = utils.loadImage("victor1_cam.jpg")
 
 
 label = Label(frame, image = img)
 label.pack()
 
+openAdmin()
 
 root.mainloop()
 
