@@ -2,7 +2,17 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
+import datetime
 
+def timeNowToStr( self, data ):
+    now = datetime.datetime.now()
+    return timeNowToStr( now )
+
+def timeToStr( self, data ):
+    return data.strftime('%Y/%m/%d')
+    
+def strToTime( self, strTime):
+    return datetime.datetime.strptime(strTime, '%Y/%m/%d')
 
 def loadImage( file, maxWidth = -1 ):
     image = Image.open(file)

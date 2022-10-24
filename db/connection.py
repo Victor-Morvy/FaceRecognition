@@ -1,5 +1,7 @@
 import os
 import sqlite3
+import datetime
+# import frm.utils
 
 class BancoDeDados():
 
@@ -11,10 +13,10 @@ class BancoDeDados():
             self.cursor = self.conn.cursor()
             print("conexao estabelecida com sucesso")
 
-            self.sqlite_select_Query = "select sqlite_version();"
-            self.cursor.execute(self.sqlite_select_Query)
-            record = self.cursor.fetchall()
-            print("SQLite Database Version is: ", record)
+            # self.sqlite_select_Query = "select sqlite_version();"
+            # self.cursor.execute(self.sqlite_select_Query)
+            # record = self.cursor.fetchall()
+            # print("SQLite Database Version is: ", record)
             #self.cursor.close()
 
         except:
@@ -38,36 +40,50 @@ class BancoDeDados():
             return True
         except ConnectionAbortedError:
             return False
-
+        
     def getAlunoByRA( self, ra ):
-        self.conn.execute(f"SELECT * FROM alunos WHERE ra_aluno = '{ra}'")
-        c = self.conn.cursor()
-        return c.fetchone()
+        self.conecta_db()
+        c = self.conn.execute(f"SELECT * FROM alunos WHERE ra_aluno = '{ra}'")
+        aluno = c.fetchone()
+        self.desconecta_db()
+        return aluno[0]
 
     def listarAlunos(self):
-        self.conn.execute( f"SELECT * FROM alunos" )
-        c = self.conn.cursor()
-        return c.fetchall()
+        res = self.conn.execute( f"SELECT * FROM alunos ORDER BY ra_aluno ASC" )
+        # c = self.conn.cursor()
+        alunos = res.fetchall()
+        return alunos
 
     def checkAlunoExists( self, ra ):
-        self.conn.execute( f"SELECT EXISTS(SELECT 1 FROM alunos WHERE ra_aluno='{ra}')")
+        self.conecta_db()
+
+        self.conn.execute( f"SELECT EXISTS(SELECT * FROM alunos WHERE ra_aluno='{ra}')")
         c = self.conn.cursor()
-        if c.fetchone:
+        obj = c.fetchone
+        if obj:
+            self.desconecta_db()
             return True
+        self.desconecta_db()
         return False
 
     def updateAluno( self, ra, nome ):
+        self.conecta_db()
         self.conn.execute( f"UPDATE alunos SET nome_aluno='{nome}' WHERE ra_aluno='{ra}'" )
         self.conn.commit()
+        self.desconecta_db()
 
     def excluirAluno(self, ra):
+        self.conecta_db()
         self.conn.execute( f"DELETE FROM alunos WHERE ra_aluno = {ra}" )
         
         try:
             self.conn.commit()
+            self.desconecta_db()
             return True
         except ConnectionAbortedError:
+            self.desconecta_db()
             return False
+        
         
     
 

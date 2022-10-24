@@ -1,6 +1,5 @@
-from turtle import bgcolor
-import cv2
-import face_recognition as fr
+from asyncio.windows_events import NULL
+
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -8,6 +7,9 @@ from PIL import ImageTk, Image
 # import frm.FrmAdmin as frm
 import frm.utils as utils
 import frm.FrmAdmin as frmAdmin
+
+from threading import Thread
+from time import sleep
 
 def donothing():
    x = 0
@@ -18,11 +20,44 @@ root.title("Presença de alunos")
 root.config( bg="white" )
 root.geometry( '1024x862' )
 
-window = {}
+runThread = True
+
+def existWindow():
+   if 'window' in globals():
+      return True
+   
+   return False
+
+def update():   
+   if( existWindow() ):
+      global window
+      window.myLoop()
+      
+def threaded_update():  
+   global runThread
+   global window
+      
+   while runThread :
+      update()
+      sleep(0.16)
+
+def openThread():
+   global thread_
+
+   thread_ = Thread(target=threaded_update)
+   thread_.start()   
+   
+openThread()   
 
 def openAdmin():
+   
+   global runThread
+   global window
+   global thread_
+
    window = frmAdmin.FrmAdmin( root )
    window.grab_set()
+   
 
 menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
@@ -68,6 +103,9 @@ label.pack()
 openAdmin()
 
 root.mainloop()
+
+runThread = False
+
 
 # /////////////////////////////////////////////////////
 

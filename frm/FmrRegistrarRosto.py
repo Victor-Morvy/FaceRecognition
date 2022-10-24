@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
 import frm.utils as utils
+
+import frm.FrmImgWidget as imgWidget
 import os
 
 class FmrRegistrarRosto(tk.Toplevel):
@@ -30,10 +32,14 @@ class FmrRegistrarRosto(tk.Toplevel):
         self.labelJump2 = Label(self, text="GERENCIAR CADASTRO")
         self.labelJump2.pack()
 
-        self.label = Label(self, image = self.img)
-        self.label.pack()
+        self.videoWidget = imgWidget.VideoWidget(self)
+        self.videoWidget.pack()
 
         self.btnTakePhoto = Button(self, text="Tirar Foto", width=10, command=self.doNothing).pack()
+
+    def myLoop(self):
+        self.videoWidget.myLoop()
+        print("Loop registrar rosto")
 
     def doNothing():
         a = 0
