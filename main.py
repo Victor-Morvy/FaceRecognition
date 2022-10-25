@@ -14,7 +14,6 @@ from time import sleep
 def donothing():
    x = 0
 
-
 root = Tk()
 root.title("Presença de alunos")
 root.config( bg="white" )
@@ -39,8 +38,9 @@ def threaded_update():
       
    while runThread :
       update()
-      sleep(0.16)
-
+      # sleep(0.032)
+      sleep(0.1)
+      
 def openThread():
    global thread_
 
@@ -61,20 +61,30 @@ def openAdmin():
 
 menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Manager Dialog", command=openAdmin)
+filemenu.add_command(label="Gerenciar", command=openAdmin)
 # filemenu.add_command(label="Open", command=donothing)
 # filemenu.add_command(label="Save", command=donothing)
 filemenu.add_separator()
-filemenu.add_command(label="Exit", command=root.quit)
-menubar.add_cascade(label="File", menu=filemenu)
+filemenu.add_command(label="Sair", command=root.quit)
+menubar.add_cascade(label="Arquivo", menu=filemenu)
 
 helpmenu = Menu(menubar, tearoff=0)
 # helpmenu.add_command(label="Help Index", command=donothing)
-helpmenu.add_command(label="About...", command=donothing)
-menubar.add_cascade(label="Help", menu=helpmenu)
+helpmenu.add_command(label="Sobre...", command=donothing)
+menubar.add_cascade(label="Ajuda", menu=helpmenu)
 
 root.config(menu=menubar)
 
+def closeWindow():
+   global runThread
+   global root
+   runThread = False
+   global thread_
+   thread_.join()
+   root.destroy()
+   
+
+root.protocol("WM_DELETE_WINDOW", closeWindow)
 
 frame = Frame( root, width=800, height=600 )
 frame.pack()
@@ -100,12 +110,12 @@ img = utils.loadImage("victor1_cam.jpg")
 label = Label(frame, image = img)
 label.pack()
 
-openAdmin()
-
 root.mainloop()
+
 
 runThread = False
 
+print("Good bye!")
 
 # /////////////////////////////////////////////////////
 

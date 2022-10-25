@@ -98,7 +98,6 @@ class FrmAdmin(tk.Toplevel):
     def myLoop(self):
         if hasattr( self, "registraFoto"):
             self.registraFoto.myLoop()
-            print( " É isso ai carai " )
 
         
     def updateTree( self ):

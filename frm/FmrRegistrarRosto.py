@@ -12,8 +12,8 @@ class FmrRegistrarRosto(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.geometry('650x450')
-        self.maxsize( 650,450 )
+        self.geometry('650x550')
+        self.maxsize( 650,550 )
         self.title('Registro de rosto')
 
         self.labelDescrip = Label( self, text="Success", font="Arial 16", fg="white" )
@@ -22,24 +22,40 @@ class FmrRegistrarRosto(tk.Toplevel):
         # labelDescrip = Label( self, text="Error!", font="Arial 16", fg="red" )
         # labelDescrip.config(bg="#8a3d3d")
 
-
         # os.chdir("..")
         # filePath = os.getcwd() + "/image/no_image.png"
         self.img = utils.loadImageH( 'image/no_image.png', 350 ) #tmp
         # print( filePath )
 
-
-        self.labelJump2 = Label(self, text="GERENCIAR CADASTRO")
-        self.labelJump2.pack()
-
-        self.videoWidget = imgWidget.VideoWidget(self)
+        self.videoWidget = imgWidget.VideoWidget(self, imgWidget.VideoRole.TAKE_PHOTO_WIDGET)
         self.videoWidget.pack()
 
-        self.btnTakePhoto = Button(self, text="Tirar Foto", width=10, command=self.doNothing).pack()
+        # self.btnTakePhoto = Button(self, text="Tirar Foto", width=10, command=self.doNothing).pack()
+        self.btnFoto = Button(self, text="Tirar Foto", width=15, command=self.on_click_btn_foto).pack()
 
     def myLoop(self):
         self.videoWidget.myLoop()
-        print("Loop registrar rosto")
+        faceStatus = self.videoWidget.getFaceRegisterStatus()
+
+        if faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
+            self.labelDescrip.config( text="Reconhecendo mais de um rosto",
+                                    bg="#8a3d3d",
+                                    fg="black" )
+        elif faceStatus == imgWidget.FaceStatus.PROCURANDO:
+            self.labelDescrip.config( text="Procurando...",
+                                    bg="#FDD017",
+                                    fg="black" )
+        elif faceStatus == imgWidget.FaceStatus.OFF:
+            self.labelDescrip.config( text="Camera desligada",
+                                    bg="#8a3d3d",
+                                    fg="black" )
+        elif faceStatus == imgWidget.FaceStatus.ENCONTROU_UM_ROSTO:
+            self.labelDescrip.config( text="Reconhecendo rosto",
+                                    bg="#1f4a1b",
+                                    fg="white")
+
+    def on_click_btn_foto( self ):
+        a = 0
 
     def doNothing():
         a = 0
