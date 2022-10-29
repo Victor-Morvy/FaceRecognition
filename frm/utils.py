@@ -1,6 +1,4 @@
-import tkinter as tk
 from tkinter import *
-from tkinter import ttk
 from PIL import ImageTk, Image
 import datetime
 
@@ -55,5 +53,6 @@ def loadImageH( file, maxHeight = -1 ):
 
     image = image.resize((int(newWidth), int(newHeight)))
     img = ImageTk.PhotoImage(image)
+
     
-    return img
+    return img, image

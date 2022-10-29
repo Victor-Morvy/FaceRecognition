@@ -11,13 +11,7 @@ class BancoDeDados():
 
             self.conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
             self.cursor = self.conn.cursor()
-            print("conexao estabelecida com sucesso")
-
-            # self.sqlite_select_Query = "select sqlite_version();"
-            # self.cursor.execute(self.sqlite_select_Query)
-            # record = self.cursor.fetchall()
-            # print("SQLite Database Version is: ", record)
-            #self.cursor.close()
+            # print("conexao estabelecida com sucesso")
 
         except:
             print("erro ao conectar no banco")
@@ -33,6 +27,11 @@ class BancoDeDados():
                     ( [ra_aluno] INTEGER PRIMARY KEY, [nome_aluno] TEXT )
                 ''')
 
+    def cleanDB(self):
+        conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
+        c = conn.cursor()
+        c.execute("DELETE * FROM alunos")
+
     def addAluno(self, ra, nome):
         self.conn.execute(f"INSERT INTO alunos(ra_aluno, nome_aluno) values('{ra}', '{nome}')")
         try:
@@ -46,11 +45,10 @@ class BancoDeDados():
         c = self.conn.execute(f"SELECT * FROM alunos WHERE ra_aluno = '{ra}'")
         aluno = c.fetchone()
         self.desconecta_db()
-        return aluno[0]
+        return aluno
 
     def listarAlunos(self):
         res = self.conn.execute( f"SELECT * FROM alunos ORDER BY ra_aluno ASC" )
-        # c = self.conn.cursor()
         alunos = res.fetchall()
         return alunos
 

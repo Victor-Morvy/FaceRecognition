@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
-import requests
+
 import imutils
 import cv2
 import numpy as np
@@ -20,7 +20,7 @@ class FaceStatus( Enum ):
     OFF = -1
     ENCONTROU_MAIS_DE_UM_ROSTO = 0
     PROCURANDO = 1
-    ENCONTROU_UM_ROSTO = 2
+    TIRE_FOTO = 2
     
 class VideoWidget( Label ):
     
@@ -32,6 +32,10 @@ class VideoWidget( Label ):
         self.setPause( False )
 
         self.cam = cv2.VideoCapture(0)
+    
+    def __del__( self ):
+        print( "Cam release ")
+        self.cam.release()
 
     def getFaceRegisterStatus(self):
         if hasattr(self, 'faceStatus'):
@@ -39,10 +43,14 @@ class VideoWidget( Label ):
         return FaceStatus.OFF
 
     def setPause( self, isPaused ):
+        # if hasattr(self, "cam"):
+        #     self.cam.release()
         self.paused = isPaused
 
     def myLoop(self):
         if self.paused == True:
+            # self.cam.release()
+            # self.photo = None
             return
 
         ret, imgFrame = self.cam.read()
@@ -51,7 +59,7 @@ class VideoWidget( Label ):
         videoFrame = cv2.cvtColor(imgFrame, cv2.COLOR_BGR2RGB)
         if ret:
             self.image = imgFrame
-            self.videoFrameRGB = videoFrame
+            self.videoFrameRGB = imgFrame
             if self.role == VideoRole.TAKE_PHOTO_WIDGET:
                 # convert to PIL image
                 img = Image.fromarray(videoFrame)
@@ -75,7 +83,7 @@ class VideoWidget( Label ):
                 elif listSize == 0:
                     self.faceStatus = FaceStatus.PROCURANDO
                 else:
-                    self.faceStatus = FaceStatus.ENCONTROU_UM_ROSTO
+                    self.faceStatus = FaceStatus.TIRE_FOTO
 
                 try:
                     if hasattr( self, "configure" ):
@@ -87,6 +95,7 @@ class VideoWidget( Label ):
             self.imageUrl = "image/no_image.png"
             self.photo = utils.loadImageH(self.imageUrl, maxHeight=240)
             self.configure( image = self.photo )
+
 
 
     def getVideoFrame( self ):

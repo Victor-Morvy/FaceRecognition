@@ -7,9 +7,83 @@ from PIL import ImageTk, Image
 # import frm.FrmAdmin as frm
 import frm.utils as utils
 import frm.FrmAdmin as frmAdmin
-
+import sys
 from threading import Thread
+import threading
 from time import sleep
+import multiprocessing
+import ctypes
+import inspect
+
+def _async_raise(tid, exctype):
+    '''Raises an exception in the threads with id tid'''
+    if not inspect.isclass(exctype):
+        raise TypeError("Only types can be raised (not instances)")
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid),
+                                                     ctypes.py_object(exctype))
+    if res == 0:
+        raise ValueError("invalid thread id")
+    elif res != 1:
+        # "if it returns a number greater than one, you're in trouble,
+        # and you should call it again with exc=NULL to revert the effect"
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid), None)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
+
+class ThreadWithExc(threading.Thread):
+    '''A thread class that supports raising an exception in the thread from
+       another thread.
+    '''
+    def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+
+    def _get_my_tid(self):
+        """determines this (self's) thread id
+
+        CAREFUL: this function is executed in the context of the caller
+        thread, to get the identity of the thread represented by this
+        instance.
+        """
+        if not self.is_alive():
+            raise threading.ThreadError("the thread is not active")
+
+        # do we have it cached?
+        if hasattr(self, "_thread_id"):
+            return self._thread_id
+
+        # no, look for it in the _active dict
+        for tid, tobj in threading._active.items():
+            if tobj is self:
+                self._thread_id = tid
+                return tid
+
+        # TODO: in python 2.6, there's a simpler way to do: self.ident
+
+        raise AssertionError("could not determine the thread's id")
+
+    def raiseExc(self, exctype):
+        """Raises the given exception type in the context of this thread.
+
+        If the thread is busy in a system call (time.sleep(),
+        socket.accept(), ...), the exception is simply ignored.
+
+        If you are sure that your exception should terminate the thread,
+        one way to ensure that it works is:
+
+            t = ThreadWithExc( ... )
+            ...
+            t.raiseExc( SomeException )
+            while t.isAlive():
+                time.sleep( 0.1 )
+                t.raiseExc( SomeException )
+
+        If the exception is to be caught by the thread, you need a way to
+        check that your thread has caught it.
+
+        CAREFUL: this function is executed in the context of the
+        caller thread, to raise an exception in the context of the
+        thread represented by this instance.
+        """
+        _async_raise( self._get_my_tid(), exctype )
 
 def donothing():
    x = 0
@@ -26,25 +100,27 @@ def existWindow():
       return True
    
    return False
-
-def update():   
-   if( existWindow() ):
-      global window
-      window.myLoop()
       
 def threaded_update():  
    global runThread
    global window
+   global root
       
    while runThread :
-      update()
+      if( existWindow() ):
+         window.myLoop()
       # sleep(0.032)
       sleep(0.1)
+
+   print( "End thread ")
+   raise SystemExit
+   raise Exception('Close')
+   
       
 def openThread():
    global thread_
 
-   thread_ = Thread(target=threaded_update)
+   thread_ = ThreadWithExc(target=threaded_update)
    thread_.start()   
    
 openThread()   
@@ -78,11 +154,18 @@ root.config(menu=menubar)
 def closeWindow():
    global runThread
    global root
+   global label
    runThread = False
    global thread_
-   thread_.join()
-   root.destroy()
+   print( "Run setted to false ")
    
+   label.destroy()
+   del label
+   root.destroy()
+   # raise SystemExit
+   
+   # thread_.join()
+   # root.destroy()
 
 root.protocol("WM_DELETE_WINDOW", closeWindow)
 
@@ -112,10 +195,14 @@ label.pack()
 
 root.mainloop()
 
-
-runThread = False
-
 print("Good bye!")
+
+# if thread_.is_alive:
+#    print( "Ta vivo minha gent ")
+   
+thread_.raiseExc(OSError)
+sys.exit()
+raise SystemExit
 
 # /////////////////////////////////////////////////////
 
