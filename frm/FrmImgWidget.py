@@ -21,6 +21,7 @@ class FaceStatus( Enum ):
     ENCONTROU_MAIS_DE_UM_ROSTO = 0
     PROCURANDO = 1
     TIRE_FOTO = 2
+    MATCH_FOTO = 3
     
 class VideoWidget( Label ):
     
@@ -78,23 +79,27 @@ class VideoWidget( Label ):
                 # convert to Tkinter image
                 photo = ImageTk.PhotoImage(image=img)
             
-                # solution for bug in `PhotoImage`
+                # # solution for bug in `PhotoImage`
                 self.photo = photo
 
-                reconhecimento = mp.solutions.face_detection
-                reconhecedor = reconhecimento.FaceDetection()
-                lista_rostos = reconhecedor.process(imgFrame)
 
-                listSize = 0
-                if lista_rostos.detections:
-                    listSize = len(lista_rostos.detections)
+                self.faceStatus = FaceStatus.TIRE_FOTO
 
-                if listSize > 1:
-                    self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
-                elif listSize == 0:
-                    self.faceStatus = FaceStatus.PROCURANDO
-                else:
-                    self.faceStatus = FaceStatus.TIRE_FOTO
+                # reconhecimento = mp.solutions.face_detection
+                # reconhecedor = reconhecimento.FaceDetection()
+                # lista_rostos = reconhecedor.process(imgFrame)
+
+                # listSize = 0
+                # if lista_rostos.detections:
+                #     listSize = len(lista_rostos.detections)
+
+                # if listSize > 1:
+                #     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
+                # elif listSize == 0:
+                #     self.faceStatus = FaceStatus.PROCURANDO
+                # else:
+                #     self.faceStatus = FaceStatus.TIRE_FOTO
+
 
                 try:
                     if hasattr( self, "configure" ):
@@ -131,6 +136,7 @@ class VideoWidget( Label ):
 
                         if achou[0]:
                             print ("Achou " + aluno[1])
+                            break
 
                         i += 1
 
@@ -150,7 +156,6 @@ class VideoWidget( Label ):
     #atualizara as tuplas do banco de dados dos alunos para comparação com a imagem da camera atual
     #update: também fará o face_encoding para tentar acelerar o processo
     def getImageSets( self ):
-        a = 0
         self.db.conecta_db()
         self.alunosToCompare = self.db.listarAlunos()
         

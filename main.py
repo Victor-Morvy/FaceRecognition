@@ -125,7 +125,7 @@ def threaded_update():
    global labelDescrip
       
    while runThread :
-      sleep(0.03)
+      sleep(0.1)
       if( existWindow() ):
          window.myLoop()
       if( video_widget ):
@@ -152,7 +152,7 @@ def threaded_update():
                                              bg="#8a3d3d",
                                              fg="black" )
                   elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
-                     labelDescrip.config( text="Reconhecendo rosto",
+                     labelDescrip.config( text="Tire foto do aluno",
                                              bg="#1f4a1b",
                                              fg="white") 
                except:
@@ -160,8 +160,11 @@ def threaded_update():
 
 
                if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
-                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
+                  window.close_window = False
                   window.destroy()
+                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
+                  video_widget.getImageSets()
+                  
 
                if existWindow() and window.updateFoto:
                   videoFrame = video_widget.getVideoFrame()
@@ -171,16 +174,12 @@ def threaded_update():
 
                   window.showTmpImage = True
                   window.updateFoto = False
-                  #TODO : update imageSets
-                  # video_widget.getImageSets()
-      # sleep(0.032)
       
 
    print( "End thread ")
    raise SystemExit
    raise Exception('Close')
    
-      
 def openThread():
    global thread_
 
@@ -200,8 +199,6 @@ def openAdmin():
 
    window = frmAdmin.FrmAdmin( root )
    window.grab_set()
-
-   # video_widget.setPause(True)
    
 
 menubar = Menu(root)
@@ -212,7 +209,6 @@ filemenu.add_command(label="Sair", command=root.quit)
 menubar.add_cascade(label="Arquivo", menu=filemenu)
 
 helpmenu = Menu(menubar, tearoff=0)
-# helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="Sobre...", command=donothing)
 menubar.add_cascade(label="Ajuda", menu=helpmenu)
 
@@ -227,27 +223,14 @@ def closeWindow():
    video_widget.destroy
    del video_widget
    root.destroy()
-   # raise SystemExit
-   
-   # thread_.join()
-   # root.destroy()
 
 root.protocol("WM_DELETE_WINDOW", closeWindow)
 
 frame.pack()
 frame.place( anchor='center', relx=0.5, rely=0.5 )
 
-# labelNome = Label( frame, text="Joe da Silva", font="Arial 16" )
-# labelNome.pack(fill=X, anchor=NW, expand=True)
-# labelRA = Label( frame, text="RA: 654651445141", font="Arial 16" )
-# labelRA.pack(fill=X, anchor=NW, expand=True)
-
 labelDescrip = Label( frame, text="Searching...", font="Arial 16", fg="Yellow" )
 labelDescrip.config( bg="#cca01d" )
-# labelDescrip = Label( frame, text="Success", font="Arial 16", fg="white" )
-# labelDescrip.config(bg="#1f4a1b")
-# labelDescrip = Label( frame, text="Error!", font="Arial 16", fg="red" )
-# labelDescrip.config(bg="#8a3d3d")
 
 labelDescrip.pack(fill=X, anchor=NW, expand=True)
 
@@ -260,24 +243,3 @@ print("Good bye!")
 thread_.raiseExc(OSError)
 sys.exit()
 raise SystemExit
-
-# /////////////////////////////////////////////////////
-
-# fromImg = fr.load_image_file('victor2.jpg')
-# fromImg = cv2.cvtColor(fromImg,cv2.COLOR_BGR2RGB)
-# camImg = fr.load_image_file('victor1.jpg')
-# camImg = cv2.cvtColor(camImg,cv2.COLOR_BGR2RGB)
-
-# faceLoc = fr.face_locations(fromImg)[0]
-# cv2.rectangle(fromImg,(faceLoc[3],faceLoc[0]),(faceLoc[1],faceLoc[2]),(0,255,0),2)
-
-# encodeElon = fr.face_encodings(fromImg)[0]
-# encodeElonTest = fr.face_encodings(camImg)[0]
-
-# comparacao = fr.compare_faces([encodeElon],encodeElonTest)
-# distancia = fr.face_distance([encodeElon],encodeElonTest)
-
-# print(comparacao,distancia)
-# cv2.imshow('From Image',fromImg)
-# cv2.imshow('Cam Image',camImg)
-# cv2.waitKey(0)

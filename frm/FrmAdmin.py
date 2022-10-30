@@ -6,7 +6,6 @@ import db.connection
 from PIL import ImageTk, Image
 import os
 import frm.utils as utils
-import frm.FmrRegistrarRosto as frmFace
 import shutil
 import cv2
 
@@ -56,7 +55,6 @@ class FrmAdmin(tk.Toplevel):
         self.btnDelete = Button(self.frame2, text="Deletar", width=10, command=self.on_click_btn_delete).grid(row=0, column=4, pady=(3), padx=(3, 0))
         
         #btn Load Image
-        # self.btnLoad = Button(self.frame2, text="Registrar Rosto", width=20, command=self.openRegistraRosto).grid(row=2, column=0, columnspan=5, pady=(3), padx=(3, 0))
         self.btnLoad = Button(self.frame2, text="Tirar Foto", width=20, command=self.tirarFoto).grid(row=2, column=0, columnspan=5, pady=(3), padx=(3, 0))
 
         self.imgFrame = Frame(self.frame2)
@@ -139,10 +137,6 @@ class FrmAdmin(tk.Toplevel):
         self.close_window = True
         # self.destroy()
 
-    def openRegistraRosto(self):
-        
-        self.registraFoto = frmFace.FmrRegistrarRosto( self )  
-        self.registraFoto.grab_set()
     
     def changeImage(self, url):
         self.img, image = utils.loadImageH(url, maxHeight=240)
