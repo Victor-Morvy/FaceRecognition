@@ -8,7 +8,7 @@ import os
 import frm.utils as utils
 import frm.FmrRegistrarRosto as frmFace
 import shutil
-
+import cv2
 
 class FrmAdmin(tk.Toplevel):
 
@@ -56,7 +56,8 @@ class FrmAdmin(tk.Toplevel):
         self.btnDelete = Button(self.frame2, text="Deletar", width=10, command=self.on_click_btn_delete).grid(row=0, column=4, pady=(3), padx=(3, 0))
         
         #btn Load Image
-        self.btnLoad = Button(self.frame2, text="Registrar Rosto", width=20, command=self.openRegistraRosto).grid(row=2, column=0, columnspan=5, pady=(3), padx=(3, 0))
+        # self.btnLoad = Button(self.frame2, text="Registrar Rosto", width=20, command=self.openRegistraRosto).grid(row=2, column=0, columnspan=5, pady=(3), padx=(3, 0))
+        self.btnLoad = Button(self.frame2, text="Tirar Foto", width=20, command=self.tirarFoto).grid(row=2, column=0, columnspan=5, pady=(3), padx=(3, 0))
 
         self.imgFrame = Frame(self.frame2)
         self.imgFrame.grid(row=3, column=0, pady=(3), padx=(3, 0), columnspan=5, rowspan=1 )
@@ -104,10 +105,17 @@ class FrmAdmin(tk.Toplevel):
         self.close_window = False
 
         self.lastEntrySize = 0
+        
+        self.updateFoto = False
+        # self.updateImageSets()
 
     def __del__( self ):
         if hasattr( self, "registraFoto" ):
             self.registraFoto.destroy
+
+    def tirarFoto( self ):
+        self.updateFoto = True
+        
 
     def selectItem( self, event ):
         try:
@@ -132,6 +140,7 @@ class FrmAdmin(tk.Toplevel):
         # self.destroy()
 
     def openRegistraRosto(self):
+        
         self.registraFoto = frmFace.FmrRegistrarRosto( self )  
         self.registraFoto.grab_set()
     
@@ -141,6 +150,7 @@ class FrmAdmin(tk.Toplevel):
         image.save( self.tmpImage )
 
     def myLoop(self):
+
         if hasattr( self, "registraFoto"):
             self.registraFoto.myLoop()
 
@@ -155,7 +165,7 @@ class FrmAdmin(tk.Toplevel):
             else:
                 self.imageUrl = self.noImage
             
-            self.changeImage( self.imageUrl)
+            self.changeImage( self.imageUrl )
         try:
             if( self.lastEntrySize != len( self.labelRaField.get() ) and
                 self.labelRaField.get().isdigit ):

@@ -14,6 +14,10 @@ from time import sleep
 import multiprocessing
 import ctypes
 import inspect
+import frm.FrmImgWidget as imgWidget
+import time
+import cv2
+
 
 def _async_raise(tid, exctype):
     '''Raises an exception in the threads with id tid'''
@@ -93,24 +97,77 @@ root.title("Presença de alunos")
 root.config( bg="white" )
 root.geometry( '1024x862' )
 
+frame = Frame( root, width=800, height=600 )
+video_widget = imgWidget.VideoWidget( frame, imgWidget.VideoRole.RECOGNIZE_PERSON )
+
 runThread = True
+
 
 def existWindow():
    if 'window' in globals():
       return True
+
+def existVideoWidget():
+   if 'video_widget' in globals():
+      return True
    
    return False
       
+_start_time = time.time()
 def threaded_update():  
    global runThread
    global window
    global root
+   global video_widget
+   global _start_time
+   global dt
+   global faceStatus
+   global labelDescrip
       
    while runThread :
+      sleep(0.03)
       if( existWindow() ):
          window.myLoop()
+      if( video_widget ):
+         video_widget.myLoop()
+         now = time.time()
+         dt = now - _start_time
+
+         if video_widget:
+
+               video_widget.myLoop()
+               faceStatus = video_widget.getFaceRegisterStatus()
+
+               try:
+                  if faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
+                     labelDescrip.config( text="Reconhecendo mais de um rosto",
+                                             bg="#8a3d3d",
+                                             fg="black" )
+                  elif faceStatus == imgWidget.FaceStatus.PROCURANDO:
+                     labelDescrip.config( text="Procurando...",
+                                             bg="#FDD017",
+                                             fg="black" )
+                  elif faceStatus == imgWidget.FaceStatus.OFF:
+                     labelDescrip.config( text="Camera desligada",
+                                             bg="#8a3d3d",
+                                             fg="black" )
+                  elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
+                     labelDescrip.config( text="Reconhecendo rosto",
+                                             bg="#1f4a1b",
+                                             fg="white") 
+               except:
+                  None
+
+               if existWindow() and window.updateFoto:
+                  videoFrame = video_widget.getVideoFrame()
+        
+                  fileName = "./tmpFoto.png"
+                  cv2.imwrite(fileName, videoFrame)
+
+                  window.showTmpImage = True
+                  window.updateFoto = False
       # sleep(0.032)
-      sleep(0.1)
+      
 
    print( "End thread ")
    raise SystemExit
@@ -130,16 +187,17 @@ def openAdmin():
    global runThread
    global window
    global thread_
+   global video_widget
 
    window = frmAdmin.FrmAdmin( root )
    window.grab_set()
+
+   # video_widget.setPause(True)
    
 
 menubar = Menu(root)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Gerenciar", command=openAdmin)
-# filemenu.add_command(label="Open", command=donothing)
-# filemenu.add_command(label="Save", command=donothing)
 filemenu.add_separator()
 filemenu.add_command(label="Sair", command=root.quit)
 menubar.add_cascade(label="Arquivo", menu=filemenu)
@@ -154,13 +212,11 @@ root.config(menu=menubar)
 def closeWindow():
    global runThread
    global root
-   global label
+   global video_widget
    runThread = False
-   global thread_
-   print( "Run setted to false ")
-   
-   label.destroy()
-   del label
+   video_widget.setPause(True)
+   video_widget.destroy
+   del video_widget
    root.destroy()
    # raise SystemExit
    
@@ -169,7 +225,6 @@ def closeWindow():
 
 root.protocol("WM_DELETE_WINDOW", closeWindow)
 
-frame = Frame( root, width=800, height=600 )
 frame.pack()
 frame.place( anchor='center', relx=0.5, rely=0.5 )
 
@@ -187,18 +242,11 @@ labelDescrip.config( bg="#cca01d" )
 
 labelDescrip.pack(fill=X, anchor=NW, expand=True)
 
-img = utils.loadImage("victor1_cam.jpg")
-
-
-label = Label(frame, image = img)
-label.pack()
+video_widget.pack()
 
 root.mainloop()
 
 print("Good bye!")
-
-# if thread_.is_alive:
-#    print( "Ta vivo minha gent ")
    
 thread_.raiseExc(OSError)
 sys.exit()
