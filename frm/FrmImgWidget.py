@@ -51,6 +51,9 @@ class VideoWidget( Label ):
         #     self.cam.release()
         self.paused = isPaused
 
+    def setRole( self, newRole: VideoRole ):
+        self.role = newRole
+
     def myLoop(self):
         if self.paused == True:
             # self.cam.release()

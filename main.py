@@ -158,6 +158,11 @@ def threaded_update():
                except:
                   None
 
+
+               if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
+                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
+                  window.destroy()
+
                if existWindow() and window.updateFoto:
                   videoFrame = video_widget.getVideoFrame()
         
@@ -166,6 +171,8 @@ def threaded_update():
 
                   window.showTmpImage = True
                   window.updateFoto = False
+                  #TODO : update imageSets
+                  # video_widget.getImageSets()
       # sleep(0.032)
       
 
@@ -188,6 +195,8 @@ def openAdmin():
    global window
    global thread_
    global video_widget
+
+   video_widget.setRole( imgWidget.VideoRole.TAKE_PHOTO_WIDGET )
 
    window = frmAdmin.FrmAdmin( root )
    window.grab_set()

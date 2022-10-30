@@ -184,8 +184,7 @@ class FrmAdmin(tk.Toplevel):
         self.showTmpImage = False
         self.lastShowTmpImage = self.showTmpImage
 
-        if hasattr(self, "close_window") and self.close_window:
-            self.destroy()
+        
                 
 
         
