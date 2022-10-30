@@ -152,7 +152,7 @@ def threaded_update():
                                              bg="#8a3d3d",
                                              fg="black" )
                   elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
-                     labelDescrip.config( text="Tire foto do aluno",
+                     labelDescrip.config( text="Olhe diretamente para a câmera",
                                              bg="#1f4a1b",
                                              fg="white") 
                except:

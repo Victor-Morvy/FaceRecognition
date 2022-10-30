@@ -22,11 +22,14 @@ class FaceStatus( Enum ):
     PROCURANDO = 1
     TIRE_FOTO = 2
     MATCH_FOTO = 3
+    ACHOU = 4
     
 class VideoWidget( Label ):
     
     def __init__(self, parent, role):
         super().__init__(parent)
+
+        self.last_face_status = FaceStatus.PROCURANDO
 
         self.db = db.connection.BancoDeDados()
 
@@ -35,6 +38,8 @@ class VideoWidget( Label ):
         self.cam = cv2.VideoCapture(0)
 
         self.getImageSets()
+
+        self.times_to_detect = []
 
         self.paused = False
     
@@ -72,6 +77,8 @@ class VideoWidget( Label ):
             img2 = img.convert("RGB")
             self.image = imgFrame
             self.videoFrameRGB = imgFrame
+            img2 = np.array(img2)
+            img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
             if self.role == VideoRole.TAKE_PHOTO_WIDGET:
                 # convert to PIL image
                 
@@ -82,8 +89,8 @@ class VideoWidget( Label ):
                 # # solution for bug in `PhotoImage`
                 self.photo = photo
 
-
                 self.faceStatus = FaceStatus.TIRE_FOTO
+
 
                 # reconhecimento = mp.solutions.face_detection
                 # reconhecedor = reconhecimento.FaceDetection()
@@ -121,24 +128,41 @@ class VideoWidget( Label ):
                 except:
                     None
 
-                # faceLoc = fr.face_locations(img2)[0]
-                # cv2.rectangle(videoFrame, (faceLoc[3],faceLoc[0]),(faceLoc[1],faceLoc[2]),(0,255,0),2)
-                img2 = np.array(img2)
-                img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
-                
                 self.encodeVideo = fr.face_encodings( img2, model = "large" )
 
-                if len(self.encodeVideo) > 0 :
-                # print( self.alunosToCompare )
-                    i = 0
-                    for aluno in self.alunosToCompare:
-                        achou = fr.compare_faces([self.encodeList[i]], self.encodeVideo[0])
+                self.faceStatus = FaceStatus.PROCURANDO
 
-                        if achou[0]:
-                            print ("Achou " + aluno[1])
+                if( self.last_face_status != self.faceStatus ):
+                    self.times_to_detect = []
+                
+                i = 0
+                if len(self.encodeVideo) == 1 :
+                    
+                    hold = False
+                    achou = fr.compare_faces(self.encodeList, self.encodeVideo[0])
+                    for item in achou:
+                        if item:
+                            hold = True
                             break
-
                         i += 1
+
+                    if hold:
+                        self.faceStatus = FaceStatus.ACHOU
+                        # print( "RA ALUNO " + str( self.alunosToCompare[i][0] ) )
+                elif len(self.encodeVideo) > 1 :
+                    self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
+                elif len(self.encodeVideo) == 0:
+                    self.faceStatus = FaceStatus.PROCURANDO
+
+                
+
+                if( self.faceStatus == FaceStatus.ACHOU and len(self.times_to_detect) < 5 ):
+                    self.times_to_detect.append(1)
+
+                if( len(self.times_to_detect) == 5 ):
+                    self.faceStatus = FaceStatus.MATCH_FOTO
+                    print( "Achou " + str( self.alunosToCompare[i][0] ) + " " + self.alunosToCompare[i][1])
+
 
                 # cv2.rectangle(videoFrame, (faceloc[3],faceloc[0]),
                 #                         (faceloc[1],faceloc[2]),
