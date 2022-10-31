@@ -11,6 +11,7 @@ import mediapipe as mp
 import face_recognition as fr
 import frm.utils as utils
 from enum import Enum
+import time
 
 class VideoRole( Enum ):
     TAKE_PHOTO_WIDGET = 0
@@ -52,6 +53,12 @@ class VideoWidget( Label ):
 
         self.paused = False
 
+        self.dt = 0
+        self.last_time = time.time()
+        self.time_now = time.time()
+
+        self.match_time_show = 0
+
     def getAlunoFound(self):
         return self._alunoRertorno
     
@@ -73,6 +80,11 @@ class VideoWidget( Label ):
         self.role = newRole
 
     def myLoop(self):
+        self.time_now = time.time()
+        self.dt = self.time_now - self.last_time
+        self.last_time = self.time_now
+        
+
         if self.paused == True:
             # self.cam.release()
             # self.photo = None
@@ -143,8 +155,6 @@ class VideoWidget( Label ):
                 self.encodeVideo = fr.face_encodings( img2, model = "large" )
 
                 self.faceStatus = FaceStatus.PROCURANDO
-
-                
                 
                 i = 0
                 if len(self.encodeVideo) == 1 :
@@ -169,16 +179,27 @@ class VideoWidget( Label ):
 
                 if( self.faceStatus == FaceStatus.ACHOU and len(self.times_to_detect) < 5 ):
                     self.times_to_detect.append(1)
+
+                
+                if( len(self.times_to_detect) >= 5 ):
+                    self.faceStatus = FaceStatus.MATCH_FOTO
+                    if( len(self.alunosToCompare) == 0 ): 
+                        return
+                    self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
+                    self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
+                    print( "Achou " + str( self.alunosToCompare[i][0] ) + " " + self.alunosToCompare[i][1])
+                    if( self.match_time_show < 3):
+                        self.match_time_show += self.dt
+                        print( "dt " + str(self.dt))
+                    else:
+                        print( "dt end " + str(self.match_time_show))
+                        self.match_time_show = 0
+                        self.times_to_detect = []
                 
                 # if len(self.times_to_detect) > 0 and self.faceStatus != FaceStatus.ACHOU:
                 #     self.times_to_detect = []
 
-                if( len(self.times_to_detect) == 5 ):
-                    self.times_to_detect = []
-                    self.faceStatus = FaceStatus.MATCH_FOTO
-                    self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
-                    self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
-                    print( "Achou " + str( self.alunosToCompare[i][0] ) + " " + self.alunosToCompare[i][1])
+                
 
                 # if( self.last_face_status != self.faceStatus ):
                 #     print("Reset")

@@ -137,36 +137,39 @@ def threaded_update():
 
                video_widget.myLoop()
                faceStatus = video_widget.getFaceRegisterStatus()
+               print( "Face status " + str( faceStatus ) )
 
-               try:
-                  if faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
-                     labelDescrip.config( text="Reconhecendo mais de um rosto",
-                                             bg="#8a3d3d",
-                                             fg="black" )
-                  elif faceStatus == imgWidget.FaceStatus.OFF:
-                     labelDescrip.config( text="Camera desligada",
-                                             bg="#8a3d3d",
-                                             fg="black" )
-                  elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
-                     labelDescrip.config( text="Olhe diretamente para a câmera",
-                                             bg="#1f4a1b",
-                                             fg="white") 
-                  elif faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
-                     aluno = video_widget.getAlunoFound
-                     labelDescrip.config( text="Aluno presente RA " + str(aluno[0]) + " - " + aluno[1] ,
-                                             bg="#1f4a1b",
-                                             fg="white") 
-                     print("Registrar no banco de dados")
-                  elif faceStatus == imgWidget.FaceStatus.ACHOU:
-                     labelDescrip.config( text="Olhe diretamente para a câmera",
-                                             bg="#1f4a1b",
-                                             fg="white") 
-                  else:# faceStatus == imgWidget.FaceStatus.PROCURANDO:
-                     labelDescrip.config( text="Procurando...",
-                                             bg="#FDD017",
-                                             fg="black" )
-               except:
-                  None
+               # try:
+               if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
+                  print("Foi match, cade a parada?")
+                  aluno = video_widget.getAlunoFound()
+                  labelDescrip.config( text="Aluno presente RA " + str(aluno.ra_aluno) + " - " + aluno.nome_aluno ,
+                                          bg="#1f4a1b",
+                                          fg="white") 
+                  print("Registrar no banco de dados")
+               elif faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
+                  labelDescrip.config( text="Reconhecendo mais de um rosto",
+                                          bg="#8a3d3d",
+                                          fg="black" )
+               elif faceStatus == imgWidget.FaceStatus.OFF:
+                  labelDescrip.config( text="Camera desligada",
+                                          bg="#8a3d3d",
+                                          fg="black" )
+               elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
+                  labelDescrip.config( text="Olhe diretamente para a câmera",
+                                          bg="#1f4a1b",
+                                          fg="white") 
+               elif faceStatus == imgWidget.FaceStatus.ACHOU:
+                  labelDescrip.config( text="Olhe diretamente para a câmera",
+                                          bg="#1f4a1b",
+                                          fg="white") 
+               else:# faceStatus == imgWidget.FaceStatus.PROCURANDO:
+                  labelDescrip.config( text="Procurando...",
+                                          bg="#FDD017",
+                                          fg="black" )
+               # except:
+               #    print( "Nao alterou ")
+               #    None
 
 
                if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
