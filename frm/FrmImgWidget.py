@@ -17,17 +17,26 @@ class VideoRole( Enum ):
     RECOGNIZE_PERSON = 1
 
 class FaceStatus( Enum ):
-    OFF = -1
-    ENCONTROU_MAIS_DE_UM_ROSTO = 0
-    PROCURANDO = 1
-    TIRE_FOTO = 2
+    OFF = -1 #
+    ENCONTROU_MAIS_DE_UM_ROSTO = 0 #
+    PROCURANDO = 1 #
+    TIRE_FOTO = 2 #
     MATCH_FOTO = 3
     ACHOU = 4
     
+
+class Aluno():
+
+    ra_aluno = 0
+    nome_aluno = ""
+
+
 class VideoWidget( Label ):
     
     def __init__(self, parent, role):
         super().__init__(parent)
+
+        self._alunoRertorno = Aluno()
 
         self.last_face_status = FaceStatus.PROCURANDO
 
@@ -42,6 +51,9 @@ class VideoWidget( Label ):
         self.times_to_detect = []
 
         self.paused = False
+
+    def getAlunoFound(self):
+        return self._alunoRertorno
     
     def __del__( self ):
         print( "Cam release ")
@@ -132,8 +144,7 @@ class VideoWidget( Label ):
 
                 self.faceStatus = FaceStatus.PROCURANDO
 
-                if( self.last_face_status != self.faceStatus ):
-                    self.times_to_detect = []
+                
                 
                 i = 0
                 if len(self.encodeVideo) == 1 :
@@ -158,11 +169,21 @@ class VideoWidget( Label ):
 
                 if( self.faceStatus == FaceStatus.ACHOU and len(self.times_to_detect) < 5 ):
                     self.times_to_detect.append(1)
+                
+                # if len(self.times_to_detect) > 0 and self.faceStatus != FaceStatus.ACHOU:
+                #     self.times_to_detect = []
 
                 if( len(self.times_to_detect) == 5 ):
+                    self.times_to_detect = []
                     self.faceStatus = FaceStatus.MATCH_FOTO
+                    self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
+                    self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
                     print( "Achou " + str( self.alunosToCompare[i][0] ) + " " + self.alunosToCompare[i][1])
 
+                # if( self.last_face_status != self.faceStatus ):
+                #     print("Reset")
+                #     self.times_to_detect = []
+                #     self.last_face_status = self.faceStatus
 
                 # cv2.rectangle(videoFrame, (faceloc[3],faceloc[0]),
                 #                         (faceloc[1],faceloc[2]),

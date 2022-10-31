@@ -143,10 +143,6 @@ def threaded_update():
                      labelDescrip.config( text="Reconhecendo mais de um rosto",
                                              bg="#8a3d3d",
                                              fg="black" )
-                  elif faceStatus == imgWidget.FaceStatus.PROCURANDO:
-                     labelDescrip.config( text="Procurando...",
-                                             bg="#FDD017",
-                                             fg="black" )
                   elif faceStatus == imgWidget.FaceStatus.OFF:
                      labelDescrip.config( text="Camera desligada",
                                              bg="#8a3d3d",
@@ -155,6 +151,20 @@ def threaded_update():
                      labelDescrip.config( text="Olhe diretamente para a câmera",
                                              bg="#1f4a1b",
                                              fg="white") 
+                  elif faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
+                     aluno = video_widget.getAlunoFound
+                     labelDescrip.config( text="Aluno presente RA " + str(aluno[0]) + " - " + aluno[1] ,
+                                             bg="#1f4a1b",
+                                             fg="white") 
+                     print("Registrar no banco de dados")
+                  elif faceStatus == imgWidget.FaceStatus.ACHOU:
+                     labelDescrip.config( text="Olhe diretamente para a câmera",
+                                             bg="#1f4a1b",
+                                             fg="white") 
+                  else:# faceStatus == imgWidget.FaceStatus.PROCURANDO:
+                     labelDescrip.config( text="Procurando...",
+                                             bg="#FDD017",
+                                             fg="black" )
                except:
                   None
 
