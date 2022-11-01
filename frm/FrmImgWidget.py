@@ -97,12 +97,12 @@ class VideoWidget( Label ):
         if ret:
             videoFrame = cv2.cvtColor(imgFrame, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(videoFrame)
-            
+
             img2 = img.convert("RGB")
             self.image = imgFrame
             self.videoFrameRGB = imgFrame
-            img2 = np.array(img2)
-            img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
+            
+           
             if self.role == VideoRole.TAKE_PHOTO_WIDGET:
                 # convert to PIL image
                 
@@ -115,6 +115,14 @@ class VideoWidget( Label ):
 
                 self.faceStatus = FaceStatus.TIRE_FOTO
 
+                # self.encodeVideo = fr.face_encodings( img2, model = "large" )
+
+                # if len(self.encodeVideo) == 1 :
+                #     self.faceStatus = FaceStatus.TIRE_FOTO
+                # elif len(self.encodeVideo) > 1 :
+                #     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
+                # elif len(self.encodeVideo) < 1 :
+                #     self.faceStatus = FaceStatus.PROCURANDO
 
                 # reconhecimento = mp.solutions.face_detection
                 # reconhecedor = reconhecimento.FaceDetection()
@@ -138,6 +146,10 @@ class VideoWidget( Label ):
                 except:
                     None
             elif self.role == VideoRole.RECOGNIZE_PERSON:
+
+                
+                img2 = np.array(img2)
+                img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
 
                 # print( "videoFrame type " + str( type(self.image) ))
                 # convert to Tkinter image
@@ -177,11 +189,14 @@ class VideoWidget( Label ):
 
                 
 
-                if( self.faceStatus == FaceStatus.ACHOU and len(self.times_to_detect) < 5 ):
+                if( self.faceStatus == FaceStatus.ACHOU ):
                     self.times_to_detect.append(1)
 
                 
                 if( len(self.times_to_detect) >= 5 ):
+
+                    if len(self.times_to_detect) == 5 :
+                        print("Len == 5, connect and add database")
                     self.faceStatus = FaceStatus.MATCH_FOTO
                     if( len(self.alunosToCompare) == 0 ): 
                         return

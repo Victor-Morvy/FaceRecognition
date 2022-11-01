@@ -125,7 +125,7 @@ def threaded_update():
    global labelDescrip
       
    while runThread :
-      sleep(0.1)
+      sleep(0.3)
       if( existWindow() ):
          window.myLoop()
       if( video_widget ):
@@ -137,7 +137,6 @@ def threaded_update():
 
                video_widget.myLoop()
                faceStatus = video_widget.getFaceRegisterStatus()
-               print( "Face status " + str( faceStatus ) )
 
                # try:
                if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
@@ -167,10 +166,7 @@ def threaded_update():
                   labelDescrip.config( text="Procurando...",
                                           bg="#FDD017",
                                           fg="black" )
-               # except:
-               #    print( "Nao alterou ")
-               #    None
-
+            
 
                if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
                   window.close_window = False
@@ -181,9 +177,10 @@ def threaded_update():
 
                if existWindow() and window.updateFoto:
                   videoFrame = video_widget.getVideoFrame()
-        
+                  print( "Take Foto" )
                   fileName = "./tmpFoto.png"
                   cv2.imwrite(fileName, videoFrame)
+                  # window.set
 
                   window.showTmpImage = True
                   window.updateFoto = False
@@ -219,7 +216,7 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Gerenciar", command=openAdmin)
 filemenu.add_separator()
 filemenu.add_command(label="Sair", command=root.quit)
-menubar.add_cascade(label="Arquivo", menu=filemenu)
+menubar.add_cascade(label="Opções", menu=filemenu)
 
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Sobre...", command=donothing)

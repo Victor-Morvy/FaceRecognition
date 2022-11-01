@@ -19,13 +19,23 @@ class BancoDeDados():
     def desconecta_db(self):
         self.conn.close()
 
-    def createDB(self):
+    def createDBTablePresenca(self):
+        conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
+        c = conn.cursor()
+        c.execute('''
+                    CREATE TABLE IF NOT EXISTS presenca
+                    ( [ra_aluno] INTEGER, [data_presenca] TEXT )
+                ''')
+
+
+    def createDBTableAlunos(self):
         conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
         c = conn.cursor()
         c.execute('''
                     CREATE TABLE IF NOT EXISTS alunos
                     ( [ra_aluno] INTEGER PRIMARY KEY, [nome_aluno] TEXT )
                 ''')
+    
 
     def cleanDB(self):
         conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")

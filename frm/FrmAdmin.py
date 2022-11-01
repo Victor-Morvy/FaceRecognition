@@ -105,15 +105,9 @@ class FrmAdmin(tk.Toplevel):
         self.lastEntrySize = 0
         
         self.updateFoto = False
-        # self.updateImageSets()
-
-    def __del__( self ):
-        if hasattr( self, "registraFoto" ):
-            self.registraFoto.destroy
 
     def tirarFoto( self ):
         self.updateFoto = True
-        
 
     def selectItem( self, event ):
         try:
@@ -133,25 +127,21 @@ class FrmAdmin(tk.Toplevel):
         entryTgt.insert(0,text)
 
     def closeWindow( self ):
-        # self.registraFoto.videoWidget.destroy
         self.close_window = True
-        # self.destroy()
 
-    
     def changeImage(self, url):
         self.img, image = utils.loadImageH(url, maxHeight=240)
         self.label.config( image=self.img )
         image.save( self.tmpImage )
 
     def myLoop(self):
+        # if hasattr( self, "registraFoto"):
+            # self.registraFoto.myLoop()
 
-        if hasattr( self, "registraFoto"):
-            self.registraFoto.myLoop()
-
-            #Get from registraFoto if it is saved
-            if hasattr( self.registraFoto, "savedFoto"):
-                self.showTmpImage = self.registraFoto.savedFoto
-            self.registraFoto.resetSavedPhoto()
+            # #Get from registraFoto if it is saved
+            # if hasattr( self.registraFoto, "savedFoto"):
+            #     self.showTmpImage = self.registraFoto.savedFoto
+            # self.registraFoto.resetSavedPhoto()
 
         if( self.showTmpImage != self.lastShowTmpImage ):
             if( self.showTmpImage ):
@@ -178,10 +168,6 @@ class FrmAdmin(tk.Toplevel):
         self.showTmpImage = False
         self.lastShowTmpImage = self.showTmpImage
 
-        
-                
-
-        
     def updateTree( self ):
         self.tree.delete(*self.tree.get_children())
         self.db.conecta_db()
