@@ -125,7 +125,7 @@ def threaded_update():
    global labelDescrip
       
    while runThread :
-      sleep(0.3)
+      sleep(0.1)
       if( existWindow() ):
          window.myLoop()
       if( video_widget ):
@@ -140,12 +140,10 @@ def threaded_update():
 
                # try:
                if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
-                  print("Foi match, cade a parada?")
                   aluno = video_widget.getAlunoFound()
                   labelDescrip.config( text="Aluno presente RA " + str(aluno.ra_aluno) + " - " + aluno.nome_aluno ,
                                           bg="#1f4a1b",
                                           fg="white") 
-                  print("Registrar no banco de dados")
                elif faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
                   labelDescrip.config( text="Reconhecendo mais de um rosto",
                                           bg="#8a3d3d",
@@ -180,8 +178,6 @@ def threaded_update():
                   print( "Take Foto" )
                   fileName = "./tmpFoto.png"
                   cv2.imwrite(fileName, videoFrame)
-                  # window.set
-
                   window.showTmpImage = True
                   window.updateFoto = False
       

@@ -1,6 +1,7 @@
 import os
 import sqlite3
-import datetime
+# import datetime
+from datetime import datetime
 # import frm.utils
 
 class BancoDeDados():
@@ -91,7 +92,15 @@ class BancoDeDados():
         except ConnectionAbortedError:
             self.desconecta_db()
             return False
-        
+    
+    def addPresenca( self, ra ) :
+        dateNow = datetime.today().strftime('%Y-%m-%d')
+        self.conn.execute(f"INSERT INTO presenca(ra_aluno, data_presenca) values('{ra}', '{dateNow}')")
+        try:
+            self.conn.commit()
+            return True
+        except ConnectionAbortedError:
+            return False
         
     
 

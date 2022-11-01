@@ -1,3 +1,4 @@
+from multiprocessing import connection
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -72,27 +73,25 @@ class VideoWidget( Label ):
         return FaceStatus.OFF
 
     def setPause( self, isPaused ):
-        # if hasattr(self, "cam"):
-        #     self.cam.release()
         self.paused = isPaused
 
     def setRole( self, newRole: VideoRole ):
         self.role = newRole
 
     def myLoop(self):
+
+        
+
         self.time_now = time.time()
         self.dt = self.time_now - self.last_time
         self.last_time = self.time_now
         
-
         if self.paused == True:
             # self.cam.release()
             # self.photo = None
             return False
 
         ret, imgFrame = self.cam.read()
-
-        # cv2 uses `BGR` but `GUI` needs `RGB
         
         if ret:
             videoFrame = cv2.cvtColor(imgFrame, cv2.COLOR_BGR2RGB)
@@ -101,11 +100,10 @@ class VideoWidget( Label ):
             img2 = img.convert("RGB")
             self.image = imgFrame
             self.videoFrameRGB = imgFrame
-            
            
             if self.role == VideoRole.TAKE_PHOTO_WIDGET:
                 # convert to PIL image
-                
+                self.times_to_detect = []
 
                 # convert to Tkinter image
                 photo = ImageTk.PhotoImage(image=img)
@@ -115,31 +113,6 @@ class VideoWidget( Label ):
 
                 self.faceStatus = FaceStatus.TIRE_FOTO
 
-                # self.encodeVideo = fr.face_encodings( img2, model = "large" )
-
-                # if len(self.encodeVideo) == 1 :
-                #     self.faceStatus = FaceStatus.TIRE_FOTO
-                # elif len(self.encodeVideo) > 1 :
-                #     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
-                # elif len(self.encodeVideo) < 1 :
-                #     self.faceStatus = FaceStatus.PROCURANDO
-
-                # reconhecimento = mp.solutions.face_detection
-                # reconhecedor = reconhecimento.FaceDetection()
-                # lista_rostos = reconhecedor.process(imgFrame)
-
-                # listSize = 0
-                # if lista_rostos.detections:
-                #     listSize = len(lista_rostos.detections)
-
-                # if listSize > 1:
-                #     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
-                # elif listSize == 0:
-                #     self.faceStatus = FaceStatus.PROCURANDO
-                # else:
-                #     self.faceStatus = FaceStatus.TIRE_FOTO
-
-
                 try:
                     if hasattr( self, "configure" ):
                         self.configure( image=self.photo )
@@ -147,11 +120,9 @@ class VideoWidget( Label ):
                     None
             elif self.role == VideoRole.RECOGNIZE_PERSON:
 
-                
                 img2 = np.array(img2)
                 img2 = cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
 
-                # print( "videoFrame type " + str( type(self.image) ))
                 # convert to Tkinter image
                 photo = ImageTk.PhotoImage(image=img)
             
@@ -186,30 +157,31 @@ class VideoWidget( Label ):
                     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
                 elif len(self.encodeVideo) == 0:
                     self.faceStatus = FaceStatus.PROCURANDO
-
-                
+                    self.times_to_detect = []
 
                 if( self.faceStatus == FaceStatus.ACHOU ):
                     self.times_to_detect.append(1)
-
                 
                 if( len(self.times_to_detect) >= 5 ):
 
                     if len(self.times_to_detect) == 5 :
                         print("Len == 5, connect and add database")
+                        ownDB = db.connection.BancoDeDados()
+                        ownDB.conecta_db()
+                        ownDB.addPresenca(self.alunosToCompare[i][0])
+                        ownDB.desconecta_db()
                     self.faceStatus = FaceStatus.MATCH_FOTO
                     if( len(self.alunosToCompare) == 0 ): 
                         return
                     self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
                     self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
-                    print( "Achou " + str( self.alunosToCompare[i][0] ) + " " + self.alunosToCompare[i][1])
-                    if( self.match_time_show < 3):
-                        self.match_time_show += self.dt
-                        print( "dt " + str(self.dt))
-                    else:
-                        print( "dt end " + str(self.match_time_show))
-                        self.match_time_show = 0
-                        self.times_to_detect = []
+                    # if( self.match_time_show < 3):
+                    #     self.match_time_show += self.dt
+                    #     print( "dt " + str(self.dt))
+                    # else:
+                    #     print( "dt end " + str(self.match_time_show))
+                    #     self.match_time_show = 0
+                        
                 
                 # if len(self.times_to_detect) > 0 and self.faceStatus != FaceStatus.ACHOU:
                 #     self.times_to_detect = []
