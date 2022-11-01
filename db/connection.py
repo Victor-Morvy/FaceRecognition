@@ -93,6 +93,18 @@ class BancoDeDados():
             self.desconecta_db()
             return False
     
+    def getPresencaFromToDate( self, fromDate, toDate ):
+        # SELECT strftime('%Y-%m-%d','now')
+
+        res = self.conn.execute(f"""
+            SELECT * FROM presenca 
+            WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+            GROUP BY data_presenca, ra_aluno
+        """)
+        print( res.fetchall() )
+        # return self.conn.fetchall()
+        
+
     def addPresenca( self, ra ) :
         dateNow = datetime.today().strftime('%Y-%m-%d')
         self.conn.execute(f"INSERT INTO presenca(ra_aluno, data_presenca) values('{ra}', '{dateNow}')")
