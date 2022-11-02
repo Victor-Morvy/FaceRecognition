@@ -169,17 +169,20 @@ def threaded_update():
 
                      # faceStatus = imgWidget.FaceStatus.TIRE_FOTO
                      video_widget.faceStatus = imgWidget.FaceStatus.TIRE_FOTO
-                     
-                     
-                  
+
                   elif( len(faces) > 1 ): 
                      print("Mais de uma pessoa detectada")
-                     # messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
                      video_widget.faceStatus = imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO  
+                     if window.updateFoto:
+                        messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
+                        window.updateFoto = False
+
                   elif( len(faces) <= 0 ):
                      print("Nenhuma pessoa detectada")
-                     # messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detectaa.')      
                      video_widget.faceStatus = imgWidget.FaceStatus.PROCURANDO
+                     if window.updateFoto:
+                        messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detecta.')   
+                        window.updateFoto = False   
                   
                   
                   

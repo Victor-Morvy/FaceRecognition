@@ -137,7 +137,7 @@ class VideoWidget( Label ):
 
                 self.encodeVideo = fr.face_encodings( img2, model = "large" )
 
-                self.faceStatus = FaceStatus.PROCURANDO
+                # self.faceStatus = FaceStatus.PROCURANDO
                 
                 i = 0
                 if len(self.encodeVideo) == 1 :
@@ -215,9 +215,12 @@ class VideoWidget( Label ):
         self.encodeList = []
 
         for aluno in self.alunosToCompare:
-            fromImg = fr.load_image_file( "./image/" + str(aluno[0]) + ".png" )
-            encodeFrom = fr.face_encodings(fromImg, model = "large")[0]
-            self.encodeList.append(encodeFrom)
+            try:
+                fromImg = fr.load_image_file( "./image/" + str(aluno[0]) + ".png" )
+                encodeFrom = fr.face_encodings(fromImg, model = "large")[0]
+                self.encodeList.append(encodeFrom)
+            except:
+                None
 
     def getVideoFrame( self ):
         try:
