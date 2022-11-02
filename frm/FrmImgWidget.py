@@ -26,12 +26,9 @@ class FaceStatus( Enum ):
     MATCH_FOTO = 3
     ACHOU = 4
     
-
 class Aluno():
-
     ra_aluno = 0
     nome_aluno = ""
-
 
 class VideoWidget( Label ):
     
@@ -80,15 +77,11 @@ class VideoWidget( Label ):
 
     def myLoop(self):
 
-        
-
         self.time_now = time.time()
         self.dt = self.time_now - self.last_time
         self.last_time = self.time_now
         
         if self.paused == True:
-            # self.cam.release()
-            # self.photo = None
             return False
 
         ret, imgFrame = self.cam.read()
@@ -136,8 +129,6 @@ class VideoWidget( Label ):
                     None
 
                 self.encodeVideo = fr.face_encodings( img2, model = "large" )
-
-                # self.faceStatus = FaceStatus.PROCURANDO
                 
                 i = 0
                 if len(self.encodeVideo) == 1 :
@@ -152,7 +143,7 @@ class VideoWidget( Label ):
 
                     if hold:
                         self.faceStatus = FaceStatus.ACHOU
-                        # print( "RA ALUNO " + str( self.alunosToCompare[i][0] ) )
+                        
                 elif len(self.encodeVideo) > 1 :
                     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
                     self.times_to_detect = []
@@ -175,36 +166,11 @@ class VideoWidget( Label ):
                         return
                     self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
                     self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
-                    # if( self.match_time_show < 3):
-                    #     self.match_time_show += self.dt
-                    #     print( "dt " + str(self.dt))
-                    # else:
-                    #     print( "dt end " + str(self.match_time_show))
-                    #     self.match_time_show = 0
-                        
                 
-                # if len(self.times_to_detect) > 0 and self.faceStatus != FaceStatus.ACHOU:
-                #     self.times_to_detect = []
-
-                
-
-                # if( self.last_face_status != self.faceStatus ):
-                #     print("Reset")
-                #     self.times_to_detect = []
-                #     self.last_face_status = self.faceStatus
-
-                # cv2.rectangle(videoFrame, (faceloc[3],faceloc[0]),
-                #                         (faceloc[1],faceloc[2]),
-                #                         (0,255,0),2 )
-                
-
-
-
         else:
             self.imageUrl = "image/no_image.png"
             self.photo = utils.loadImageH(self.imageUrl, maxHeight=240)
             self.configure( image = self.photo )
-
 
     #atualizara as tuplas do banco de dados dos alunos para comparação com a imagem da camera atual
     #update: também fará o face_encoding para tentar acelerar o processo
@@ -217,7 +183,7 @@ class VideoWidget( Label ):
         for aluno in self.alunosToCompare:
             try:
                 fromImg = fr.load_image_file( "./image/" + str(aluno[0]) + ".png" )
-                encodeFrom = fr.face_encodings(fromImg, model = "large")[0]
+                encodeFrom = fr.face_encodings(fromImg, model = "small")[0]
                 self.encodeList.append(encodeFrom)
             except:
                 None

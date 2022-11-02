@@ -141,16 +141,8 @@ class FrmAdmin(tk.Toplevel):
     def myLoop(self):
         # db_ = db.connection.BancoDeDados()
         # db_.conecta_db()
-        # db_.getPresencaFromToDate( "2022-10-28", "2022-10-31")
+        # db_.getPresencaBetweenDates( "2022-10-28", "2022-10-31")
         # db_.desconecta_db()
-        
-        # if hasattr( self, "registraFoto"):
-            # self.registraFoto.myLoop()
-
-            # #Get from registraFoto if it is saved
-            # if hasattr( self.registraFoto, "savedFoto"):
-            #     self.showTmpImage = self.registraFoto.savedFoto
-            # self.registraFoto.resetSavedPhoto()
 
         if( self.showTmpImage != self.lastShowTmpImage ):
             if( self.showTmpImage ):
@@ -164,7 +156,6 @@ class FrmAdmin(tk.Toplevel):
                 self.labelRaField.get().isdigit ):
                 self.lastEntrySize = len( self.labelRaField.get() )
                 if( self.lastEntrySize == 7 ):
-                    #TODO try to find in db
                     self.db.conecta_db()
                     aluno = self.db.getAlunoByRA( self.labelRaField.get() )
                     if( aluno ):

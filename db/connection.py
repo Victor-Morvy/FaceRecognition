@@ -6,14 +6,10 @@ from datetime import datetime
 
 class BancoDeDados():
 
-
     def conecta_db(self):
         try:
-
             self.conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
             self.cursor = self.conn.cursor()
-            # print("conexao estabelecida com sucesso")
-
         except:
             print("erro ao conectar no banco")
 
@@ -28,7 +24,6 @@ class BancoDeDados():
                     ( [ra_aluno] INTEGER, [data_presenca] TEXT )
                 ''')
 
-
     def createDBTableAlunos(self):
         conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
         c = conn.cursor()
@@ -37,7 +32,6 @@ class BancoDeDados():
                     ( [ra_aluno] INTEGER PRIMARY KEY, [nome_aluno] TEXT )
                 ''')
     
-
     def cleanDB(self):
         conn = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+"\\facesDB.sqlite")
         c = conn.cursor()
@@ -98,12 +92,11 @@ class BancoDeDados():
         # WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
         res = self.conn.execute(f"""
             SELECT * FROM presenca 
-            WHERE strftime('%s', data_presenca) BETWEEN strftime('%x', '{fromDate}') AND strftime('%x', '{toDate}' )
+            WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
             GROUP BY data_presenca, ra_aluno
         """)
-        print( res.fetchall() )
-        # return self.conn.fetchall()
-        
+        # print( res.fetchall() )
+        return res.fetchall()
 
     def addPresenca( self, ra ) :
         dateNow = datetime.today().strftime('%Y-%m-%d')
@@ -113,6 +106,3 @@ class BancoDeDados():
             return True
         except ConnectionAbortedError:
             return False
-        
-    
-

@@ -4,8 +4,6 @@ from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
-# import frm.FrmAdmin as frm
-import frm.utils as utils
 import frm.FrmAdmin as frmAdmin
 import sys
 from threading import Thread
@@ -138,8 +136,6 @@ def threaded_update():
 
                video_widget.myLoop()
                
-            
-
                if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
                   window.close_window = False
                   window.destroy()
@@ -167,29 +163,22 @@ def threaded_update():
                         window.updateFoto = False
                         window.showTmpImage = True
 
-                     # faceStatus = imgWidget.FaceStatus.TIRE_FOTO
                      video_widget.faceStatus = imgWidget.FaceStatus.TIRE_FOTO
 
                   elif( len(faces) > 1 ): 
-                     print("Mais de uma pessoa detectada")
                      video_widget.faceStatus = imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO  
                      if window.updateFoto:
                         messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
                         window.updateFoto = False
 
                   elif( len(faces) <= 0 ):
-                     print("Nenhuma pessoa detectada")
                      video_widget.faceStatus = imgWidget.FaceStatus.PROCURANDO
                      if window.updateFoto:
                         messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detecta.')   
                         window.updateFoto = False   
                   
-                  
-                  
-                  # cv2.imwrite(fileName, videoFrame)
                faceStatus = video_widget.getFaceRegisterStatus()
 
-               # try:
                if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
                   aluno = video_widget.getAlunoFound()
                   labelDescrip.config( text="Aluno presente RA " + str(aluno.ra_aluno) + " - " + aluno.nome_aluno ,
@@ -216,8 +205,6 @@ def threaded_update():
                                           bg="#FDD017",
                                           fg="black" )
                   
-      
-
    print( "End thread ")
    raise SystemExit
    raise Exception('Close')
