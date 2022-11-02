@@ -93,12 +93,12 @@ class BancoDeDados():
             self.desconecta_db()
             return False
     
-    def getPresencaFromToDate( self, fromDate, toDate ):
+    def getPresencaBetweenDates( self, fromDate, toDate ):
         # SELECT strftime('%Y-%m-%d','now')
-
+        # WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
         res = self.conn.execute(f"""
             SELECT * FROM presenca 
-            WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+            WHERE strftime('%s', data_presenca) BETWEEN strftime('%x', '{fromDate}') AND strftime('%x', '{toDate}' )
             GROUP BY data_presenca, ra_aluno
         """)
         print( res.fetchall() )

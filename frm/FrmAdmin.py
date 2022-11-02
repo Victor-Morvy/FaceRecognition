@@ -139,6 +139,11 @@ class FrmAdmin(tk.Toplevel):
         image.save( self.tmpImage )
 
     def myLoop(self):
+        # db_ = db.connection.BancoDeDados()
+        # db_.conecta_db()
+        # db_.getPresencaFromToDate( "2022-10-28", "2022-10-31")
+        # db_.desconecta_db()
+        
         # if hasattr( self, "registraFoto"):
             # self.registraFoto.myLoop()
 

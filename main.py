@@ -9,6 +9,7 @@ import frm.utils as utils
 import frm.FrmAdmin as frmAdmin
 import sys
 from threading import Thread
+from tkinter import messagebox
 import threading
 from time import sleep
 import multiprocessing
@@ -136,6 +137,53 @@ def threaded_update():
          if video_widget:
 
                video_widget.myLoop()
+               
+            
+
+               if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
+                  window.close_window = False
+                  window.destroy()
+                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
+                  video_widget.getImageSets()
+                  
+               fileName = ""
+               
+               if existWindow() and video_widget.role == imgWidget.VideoRole.TAKE_PHOTO_WIDGET:
+                  videoFrame = cv2.cvtColor(video_widget.getVideoFrame(), cv2.COLOR_BGR2GRAY) 
+                  face_cascade = cv2.CascadeClassifier('./db/haarcascade_frontalface_alt2.xml')
+                  faces = face_cascade.detectMultiScale(videoFrame, 1.1, 4)
+
+                  if( len(faces) == 1 ):                     
+                     if window.updateFoto:
+                        for (x, y, w, h) in faces:
+                           cv2.rectangle(video_widget.getVideoFrame(), (x, y), (x+w, y+h), 
+                                          (0, 0, 255), 2)
+                              
+                           faces = video_widget.getVideoFrame()[y:y + h, x:x + w]
+                           fileName = "./tmpFoto.png"
+                           cv2.imwrite(fileName, faces)
+                           print( "Take Foto" )
+                        
+                        window.updateFoto = False
+                        window.showTmpImage = True
+
+                     # faceStatus = imgWidget.FaceStatus.TIRE_FOTO
+                     video_widget.faceStatus = imgWidget.FaceStatus.TIRE_FOTO
+                     
+                     
+                  
+                  elif( len(faces) > 1 ): 
+                     print("Mais de uma pessoa detectada")
+                     # messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
+                     video_widget.faceStatus = imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO  
+                  elif( len(faces) <= 0 ):
+                     print("Nenhuma pessoa detectada")
+                     # messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detectaa.')      
+                     video_widget.faceStatus = imgWidget.FaceStatus.PROCURANDO
+                  
+                  
+                  
+                  # cv2.imwrite(fileName, videoFrame)
                faceStatus = video_widget.getFaceRegisterStatus()
 
                # try:
@@ -164,22 +212,7 @@ def threaded_update():
                   labelDescrip.config( text="Procurando...",
                                           bg="#FDD017",
                                           fg="black" )
-            
-
-               if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
-                  window.close_window = False
-                  window.destroy()
-                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
-                  video_widget.getImageSets()
                   
-
-               if existWindow() and window.updateFoto:
-                  videoFrame = video_widget.getVideoFrame()
-                  print( "Take Foto" )
-                  fileName = "./tmpFoto.png"
-                  cv2.imwrite(fileName, videoFrame)
-                  window.showTmpImage = True
-                  window.updateFoto = False
       
 
    print( "End thread ")

@@ -155,6 +155,7 @@ class VideoWidget( Label ):
                         # print( "RA ALUNO " + str( self.alunosToCompare[i][0] ) )
                 elif len(self.encodeVideo) > 1 :
                     self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
+                    self.times_to_detect = []
                 elif len(self.encodeVideo) == 0:
                     self.faceStatus = FaceStatus.PROCURANDO
                     self.times_to_detect = []
@@ -165,7 +166,6 @@ class VideoWidget( Label ):
                 if( len(self.times_to_detect) >= 5 ):
 
                     if len(self.times_to_detect) == 5 :
-                        print("Len == 5, connect and add database")
                         ownDB = db.connection.BancoDeDados()
                         ownDB.conecta_db()
                         ownDB.addPresenca(self.alunosToCompare[i][0])
