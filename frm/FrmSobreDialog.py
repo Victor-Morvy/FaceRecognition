@@ -9,6 +9,11 @@ class FrmSobre( tk.Toplevel ):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.geometry('550x350')
+        self.maxsize( 550, 350 )
+        self.minsize( 550, 350)
+        self.title('Sobre...')
+
         self.window_label = Label( self, text="""
         Trabalho de Conclusão de Curso\n
         \n
