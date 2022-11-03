@@ -14,6 +14,7 @@ import multiprocessing
 import ctypes
 import inspect
 import frm.FrmImgWidget as imgWidget
+import frm.FrmSobreDialog as sobreDialog
 import time
 import cv2
 
@@ -88,20 +89,6 @@ class ThreadWithExc(threading.Thread):
         """
         _async_raise( self._get_my_tid(), exctype )
 
-def donothing():
-   x = 0
-
-root = Tk()
-root.title("Presença de alunos")
-root.config( bg="white" )
-root.geometry( '1024x862' )
-
-frame = Frame( root, width=800, height=600 )
-video_widget = imgWidget.VideoWidget( frame, imgWidget.VideoRole.RECOGNIZE_PERSON )
-
-runThread = True
-
-
 def existWindow():
    if 'window' in globals():
       return True
@@ -111,8 +98,10 @@ def existVideoWidget():
       return True
    
    return False
-      
-_start_time = time.time()
+
+def donothing():
+   x = 0
+
 def threaded_update():  
    global runThread
    global window
@@ -125,86 +114,89 @@ def threaded_update():
       
    while runThread :
       sleep(0.1)
+
+      if( not runThread ):
+         return
+
       if( existWindow() ):
          window.myLoop()
-      if( video_widget ):
+      if( "video_widget" in globals() and video_widget ):
          video_widget.myLoop()
          now = time.time()
          dt = now - _start_time
+         _start_time = now
 
-         if video_widget:
+         # video_widget.myLoop()
+         
+         if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
+            window.close_window = False
+            window.destroy()
+            video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
+            video_widget.getImageSets()
+            
+         fileName = ""
+         
+         if existWindow() and video_widget.role == imgWidget.VideoRole.TAKE_PHOTO_WIDGET:
+            videoFrame = cv2.cvtColor(video_widget.getVideoFrame(), cv2.COLOR_BGR2GRAY) 
+            face_cascade = cv2.CascadeClassifier('./db/haarcascade_frontalface_alt2.xml')
+            faces = face_cascade.detectMultiScale(videoFrame, 1.1, 4)
 
-               video_widget.myLoop()
-               
-               if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
-                  window.close_window = False
-                  window.destroy()
-                  video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
-                  video_widget.getImageSets()
-                  
-               fileName = ""
-               
-               if existWindow() and video_widget.role == imgWidget.VideoRole.TAKE_PHOTO_WIDGET:
-                  videoFrame = cv2.cvtColor(video_widget.getVideoFrame(), cv2.COLOR_BGR2GRAY) 
-                  face_cascade = cv2.CascadeClassifier('./db/haarcascade_frontalface_alt2.xml')
-                  faces = face_cascade.detectMultiScale(videoFrame, 1.1, 4)
-
-                  if( len(faces) == 1 ):                     
-                     if window.updateFoto:
-                        for (x, y, w, h) in faces:
-                           cv2.rectangle(video_widget.getVideoFrame(), (x, y), (x+w, y+h), 
-                                          (0, 0, 255), 2)
-                              
-                           faces = video_widget.getVideoFrame()[y:y + h, x:x + w]
-                           fileName = "./tmpFoto.png"
-                           cv2.imwrite(fileName, faces)
-                           print( "Take Foto" )
+            if( len(faces) == 1 ):                     
+               if window.updateFoto:
+                  for (x, y, w, h) in faces:
+                     cv2.rectangle(video_widget.getVideoFrame(), (x, y), (x+w, y+h), 
+                                    (0, 0, 255), 2)
                         
-                        window.updateFoto = False
-                        window.showTmpImage = True
-
-                     video_widget.faceStatus = imgWidget.FaceStatus.TIRE_FOTO
-
-                  elif( len(faces) > 1 ): 
-                     video_widget.faceStatus = imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO  
-                     if window.updateFoto:
-                        messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
-                        window.updateFoto = False
-
-                  elif( len(faces) <= 0 ):
-                     video_widget.faceStatus = imgWidget.FaceStatus.PROCURANDO
-                     if window.updateFoto:
-                        messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detecta.')   
-                        window.updateFoto = False   
+                     faces = video_widget.getVideoFrame()[y:y + h, x:x + w]
+                     fileName = "./tmpFoto.png"
+                     cv2.imwrite(fileName, faces)
+                     print( "Take Foto" )
                   
-               faceStatus = video_widget.getFaceRegisterStatus()
+                  window.updateFoto = False
+                  window.showTmpImage = True
 
-               if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
-                  aluno = video_widget.getAlunoFound()
-                  labelDescrip.config( text="Aluno presente RA " + str(aluno.ra_aluno) + " - " + aluno.nome_aluno ,
-                                          bg="#1f4a1b",
-                                          fg="white") 
-               elif faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
-                  labelDescrip.config( text="Reconhecendo mais de um rosto",
-                                          bg="#8a3d3d",
-                                          fg="black" )
-               elif faceStatus == imgWidget.FaceStatus.OFF:
-                  labelDescrip.config( text="Camera desligada",
-                                          bg="#8a3d3d",
-                                          fg="black" )
-               elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
-                  labelDescrip.config( text="Olhe diretamente para a câmera",
-                                          bg="#1f4a1b",
-                                          fg="white") 
-               elif faceStatus == imgWidget.FaceStatus.ACHOU:
-                  labelDescrip.config( text="Olhe diretamente para a câmera",
-                                          bg="#1f4a1b",
-                                          fg="white") 
-               else:# faceStatus == imgWidget.FaceStatus.PROCURANDO:
-                  labelDescrip.config( text="Procurando...",
-                                          bg="#FDD017",
-                                          fg="black" )
-                  
+               video_widget.faceStatus = imgWidget.FaceStatus.TIRE_FOTO
+
+            elif( len(faces) > 1 ): 
+               video_widget.faceStatus = imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO  
+               if window.updateFoto:
+                  messagebox.showerror('Erro ao tirar foto', f'Erro: Mais de uma pessoa detecta.')    
+                  window.updateFoto = False
+
+            elif( len(faces) <= 0 ):
+               video_widget.faceStatus = imgWidget.FaceStatus.PROCURANDO
+               if window.updateFoto:
+                  messagebox.showerror('Erro ao tirar foto', f'Erro: Nenhuma pessoa detecta.')   
+                  window.updateFoto = False   
+            
+         faceStatus = video_widget.getFaceRegisterStatus()
+
+         if faceStatus == imgWidget.FaceStatus.MATCH_FOTO:
+            aluno = video_widget.getAlunoFound()
+            labelDescrip.config( text="Aluno presente RA " + str(aluno.ra_aluno) + " - " + aluno.nome_aluno ,
+                                    bg="#1f4a1b",
+                                    fg="white") 
+         elif faceStatus == imgWidget.FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO:
+            labelDescrip.config( text="Reconhecendo mais de um rosto",
+                                    bg="#8a3d3d",
+                                    fg="black" )
+         elif faceStatus == imgWidget.FaceStatus.OFF:
+            labelDescrip.config( text="Camera desligada",
+                                    bg="#8a3d3d",
+                                    fg="black" )
+         elif faceStatus == imgWidget.FaceStatus.TIRE_FOTO:
+            labelDescrip.config( text="Olhe diretamente para a câmera",
+                                    bg="#1f4a1b",
+                                    fg="white") 
+         elif faceStatus == imgWidget.FaceStatus.ACHOU:
+            labelDescrip.config( text="Olhe diretamente para a câmera",
+                                    bg="#1f4a1b",
+                                    fg="white") 
+         else:# faceStatus == imgWidget.FaceStatus.PROCURANDO:
+            labelDescrip.config( text="Procurando...",
+                                    bg="#FDD017",
+                                    fg="black" )
+            
    print( "End thread ")
    raise SystemExit
    raise Exception('Close')
@@ -213,12 +205,14 @@ def openThread():
    global thread_
 
    thread_ = ThreadWithExc(target=threaded_update)
-   thread_.start()   
-   
-openThread()   
+   thread_.start()  
 
-def openAdmin():
+def openSobre():
+   global sobre_dialog
+   sobre_dialog = sobreDialog.FrmSobre( root )
+   sobre_dialog.grab_set()
    
+def openAdmin():   
    global runThread
    global window
    global thread_
@@ -227,21 +221,7 @@ def openAdmin():
    video_widget.setRole( imgWidget.VideoRole.TAKE_PHOTO_WIDGET )
 
    window = frmAdmin.FrmAdmin( root )
-   window.grab_set()
-   
-
-menubar = Menu(root)
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Gerenciar", command=openAdmin)
-filemenu.add_separator()
-filemenu.add_command(label="Sair", command=root.quit)
-menubar.add_cascade(label="Opções", menu=filemenu)
-
-helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="Sobre...", command=donothing)
-menubar.add_cascade(label="Ajuda", menu=helpmenu)
-
-root.config(menu=menubar)
+   window.grab_set() 
 
 def closeWindow():
    global runThread
@@ -253,22 +233,52 @@ def closeWindow():
    del video_widget
    root.destroy()
 
-root.protocol("WM_DELETE_WINDOW", closeWindow)
+if __name__ == "__main__":
+   root = Tk()
+   root.title("Presença de alunos")
+   root.config( bg="white" )
+   root.geometry( '1024x862' )
+   root.attributes('-fullscreen', True)
 
-frame.pack()
-frame.place( anchor='center', relx=0.5, rely=0.5 )
+   frame = Frame( root, width=800, height=600 )
+   video_widget = imgWidget.VideoWidget( frame, imgWidget.VideoRole.RECOGNIZE_PERSON )
 
-labelDescrip = Label( frame, text="Searching...", font="Arial 16", fg="Yellow" )
-labelDescrip.config( bg="#cca01d" )
+   runThread = True
 
-labelDescrip.pack(fill=X, anchor=NW, expand=True)
+   _start_time = time.time()
 
-video_widget.pack()
+   openThread()   
 
-root.mainloop()
+   menubar = Menu(root)
+   filemenu = Menu(menubar, tearoff=0)
+   filemenu.add_command(label="Gerenciar", command=openAdmin)
+   filemenu.add_command(label="Gerar Relatório", command=donothing)
+   filemenu.add_separator()
+   filemenu.add_command(label="Sair", command=root.quit)
+   menubar.add_cascade(label="Opções", menu=filemenu)
 
-print("Good bye!")
-   
-thread_.raiseExc(OSError)
-sys.exit()
-raise SystemExit
+   helpmenu = Menu(menubar, tearoff=0)
+   helpmenu.add_command(label="Sobre...", command=openSobre)
+   menubar.add_cascade(label="Ajuda", menu=helpmenu)
+
+   root.config(menu=menubar)
+
+   root.protocol("WM_DELETE_WINDOW", closeWindow)
+
+   frame.pack()
+   frame.place( anchor='center', relx=0.5, rely=0.5 )
+
+   labelDescrip = Label( frame, text="Searching...", font="Arial 16", fg="Yellow" )
+   labelDescrip.config( bg="#cca01d" )
+
+   labelDescrip.pack(fill=X, anchor=NW, expand=True)
+
+   video_widget.pack()
+
+   root.mainloop()
+
+   print("Good bye!")
+      
+   thread_.raiseExc(OSError)
+   sys.exit()
+   raise SystemExit

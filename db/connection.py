@@ -53,7 +53,7 @@ class BancoDeDados():
         return aluno
 
     def listarAlunos(self):
-        res = self.conn.execute( f"SELECT * FROM alunos ORDER BY ra_aluno ASC" )
+        res = self.conn.execute( f"SELECT * FROM alunos ORDER BY ra_aluno DESC" )
         alunos = res.fetchall()
         return alunos
 

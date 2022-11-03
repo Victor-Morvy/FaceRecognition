@@ -76,7 +76,6 @@ class VideoWidget( Label ):
         self.role = newRole
 
     def myLoop(self):
-
         self.time_now = time.time()
         self.dt = self.time_now - self.last_time
         self.last_time = self.time_now
@@ -155,7 +154,6 @@ class VideoWidget( Label ):
                     self.times_to_detect.append(1)
                 
                 if( len(self.times_to_detect) >= 5 ):
-
                     if len(self.times_to_detect) == 5 :
                         ownDB = db.connection.BancoDeDados()
                         ownDB.conecta_db()
