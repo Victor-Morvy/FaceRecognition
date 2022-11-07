@@ -1,1 +1,1 @@
-pip install imutils
+pip install -r requirements.txt
