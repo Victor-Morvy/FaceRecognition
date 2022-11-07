@@ -1,0 +1,7 @@
+opencv-python
+Pillow
+imutils
+mediapipe
+dlib
+face_recognition
+tkcalendar
