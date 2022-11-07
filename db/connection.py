@@ -44,7 +44,25 @@ class BancoDeDados():
             return True
         except ConnectionAbortedError:
             return False
-        
+
+    def getListOfDates( self ):
+        # """
+        # WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+        #     GROUP BY data_presenca, ra_aluno
+        # """
+        # """
+        # SELECT strftime('%Y-%m-%d','now')
+        # WHERE strftime('%s', data_presenca) 
+        # BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+        # """
+        res = self.conn.execute( f"""
+            SELECT strftime("%Y-%m", data_presenca) as 'month-year' 
+            from presenca
+            group by strftime("%Y-%m", data_presenca)
+        """ )
+        alunos = res.fetchall()
+        return alunos
+
     def getAlunoByRA( self, ra ):
         self.conecta_db()
         c = self.conn.execute(f"SELECT * FROM alunos WHERE ra_aluno = '{ra}'")
@@ -88,8 +106,6 @@ class BancoDeDados():
             return False
     
     def getPresencaBetweenDates( self, fromDate, toDate ):
-        # SELECT strftime('%Y-%m-%d','now')
-        # WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
         res = self.conn.execute(f"""
             SELECT * FROM presenca 
             WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )

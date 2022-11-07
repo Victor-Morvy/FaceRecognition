@@ -40,7 +40,6 @@ class FrmAdmin(tk.Toplevel):
         self.labelRaField = Entry(self.frame2)    
         self.labelRaField.grid(row=0, column=1, ipadx="100")
         
-
         # create a Name label
         self.labelName = Label(self.frame2, text="Nome" )
         self.labelName.grid(row=1, column=0, pady=(3), padx=(3, 0))

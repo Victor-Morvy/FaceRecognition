@@ -15,6 +15,7 @@ import ctypes
 import inspect
 import frm.FrmImgWidget as imgWidget
 import frm.FrmSobreDialog as sobreDialog
+import frm.FrmGeraRelatorio as relatorioDialog
 import time
 import cv2
 
@@ -111,12 +112,16 @@ def threaded_update():
    global dt
    global faceStatus
    global labelDescrip
+   global relatorio_window
       
    while runThread :
       sleep(0.1)
 
       if( not runThread ):
          return
+
+      if( "relatorio_window" in globals() ):
+         relatorio_window.myLoop()
 
       if( existWindow() ):
          window.myLoop()
@@ -233,6 +238,12 @@ def closeWindow():
    del video_widget
    root.destroy()
 
+def openRelatorio():
+   global relatorio_window
+
+   relatorio_window = relatorioDialog.FrmRelatorio( root )
+   relatorio_window.grab_set()
+
 if __name__ == "__main__":
    root = Tk()
    root.title("Presença de alunos")
@@ -252,7 +263,7 @@ if __name__ == "__main__":
    menubar = Menu(root)
    filemenu = Menu(menubar, tearoff=0)
    filemenu.add_command(label="Gerenciar", command=openAdmin)
-   filemenu.add_command(label="Gerar Relatório", command=donothing)
+   filemenu.add_command(label="Gerar Relatório", command=openRelatorio)
    filemenu.add_separator()
    filemenu.add_command(label="Sair", command=root.quit)
    menubar.add_cascade(label="Opções", menu=filemenu)

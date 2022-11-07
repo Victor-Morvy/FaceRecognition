@@ -25,7 +25,6 @@ class FrmSobre( tk.Toplevel ):
         RA 1800935 – Luiz Almeida\n
         \n
         \n
-        
         """ )
 
         self.window_label.pack()
