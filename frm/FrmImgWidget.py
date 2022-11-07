@@ -129,41 +129,46 @@ class VideoWidget( Label ):
 
                 self.encodeVideo = fr.face_encodings( img2, model = "large" )
                 
-                i = 0
-                if len(self.encodeVideo) == 1 :
-                    
-                    hold = False
-                    achou = fr.compare_faces(self.encodeList, self.encodeVideo[0])
-                    for item in achou:
-                        if item:
-                            hold = True
-                            break
-                        i += 1
+                try:
 
-                    if hold:
-                        self.faceStatus = FaceStatus.ACHOU
+                    i = 0
+                    if len(self.encodeVideo) == 1 :
                         
-                elif len(self.encodeVideo) > 1 :
-                    self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
-                    self.times_to_detect = []
-                elif len(self.encodeVideo) == 0:
+                        hold = False
+                        achou = fr.compare_faces(self.encodeList, self.encodeVideo[0])
+                        for item in achou:
+                            if item:
+                                hold = True
+                                break
+                            i += 1
+
+                        if hold:
+                            self.faceStatus = FaceStatus.ACHOU
+
+                    elif len(self.encodeVideo) > 1 :
+                        self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
+                        self.times_to_detect = []
+                    elif len(self.encodeVideo) == 0:
+                        self.faceStatus = FaceStatus.PROCURANDO
+                        self.times_to_detect = []
+
+                    if( self.faceStatus == FaceStatus.ACHOU ):
+                        self.times_to_detect.append(1)
+                    
+                    if( len(self.times_to_detect) >= 5 ):
+                        if len(self.times_to_detect) == 5 :
+                            ownDB = db.connection.BancoDeDados()
+                            ownDB.conecta_db()
+                            ownDB.addPresenca(self.alunosToCompare[i][0])
+                            ownDB.desconecta_db()
+                        self.faceStatus = FaceStatus.MATCH_FOTO
+                        if( len(self.alunosToCompare) == 0 ): 
+                            return
+                        self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
+                        self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
+                except:
                     self.faceStatus = FaceStatus.PROCURANDO
                     self.times_to_detect = []
-
-                if( self.faceStatus == FaceStatus.ACHOU ):
-                    self.times_to_detect.append(1)
-                
-                if( len(self.times_to_detect) >= 5 ):
-                    if len(self.times_to_detect) == 5 :
-                        ownDB = db.connection.BancoDeDados()
-                        ownDB.conecta_db()
-                        ownDB.addPresenca(self.alunosToCompare[i][0])
-                        ownDB.desconecta_db()
-                    self.faceStatus = FaceStatus.MATCH_FOTO
-                    if( len(self.alunosToCompare) == 0 ): 
-                        return
-                    self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
-                    self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
                 
         else:
             self.imageUrl = "image/no_image.png"
