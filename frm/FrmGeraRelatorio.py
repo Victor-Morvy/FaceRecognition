@@ -3,9 +3,12 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
+import frm.utils as utils
 import datetime
 import re
+import calendar
 from tkcalendar import Calendar, DateEntry
+import db.connection as connection
 
 class FrmRelatorio( tk.Toplevel ):
     def __init__(self, parent):
@@ -18,7 +21,7 @@ class FrmRelatorio( tk.Toplevel ):
         self.minsize( 1024, 852)
         self.title('Relatório de Presença')
 
-        self.labelJump2 = Label(self, text="PROCURAR")
+        self.labelJump2 = Label(self, text="Escola a data:")
         self.labelJump2.pack()
 
         self.findFrame = Frame(self, bd=3)
@@ -28,37 +31,65 @@ class FrmRelatorio( tk.Toplevel ):
         self.selected_month = tk.StringVar()
         self.month_cb = ttk.Combobox(self, textvariable=self.selected_month)
 
-        # self.createCBValues()
-        self.month_cb['values']=(
-            "test",
-            "test23"
-        )
+        
+
+        db = connection.BancoDeDados()
+        db.conecta_db()
+        dateLists = db.getListOfDates()
+        db.desconecta_db()
+
+        self.month_cb['values']=( dateLists )
         # prevent typing a value
         self.month_cb['state'] = 'readonly'
         # self.month_cb.grid( row=1, column=1 )
         self.month_cb.pack()
 
-        # create DESDE label
-        self.dataFrom = Label(self.findFrame, text="Desde (AAAA-mm-dd):")
-        self.dataFrom.grid(row=0, column=0, pady=(3), padx=(3, 0))
-        self.dataFromField = Entry(self.findFrame)    
-        self.dataFromField.grid(row=0, column=1, ipadx="5")
-        # self.dataFromField.bind("<1>", self.openCalendar())
+        self.treeResults = ttk.Treeview(self, column=("c1", "c2"), show='headings', height=38)
+        self.treeResults.column("# 1", anchor=CENTER)
+        self.treeResults.heading("# 1", text="RA")
+        self.treeResults.column("# 2", anchor=CENTER)
+        self.treeResults.heading("# 2", text="Name")
+
+        self.treeResults.pack()
+
+        self.treeResults.configure(columns=("c2", "c3", "c4"))
         
-        # create ATE label
-        self.dataAte = Label(self.findFrame, text="Até (AAAA-mm-dd):" )
-        self.dataAte.grid(row=0, column=2, pady=(3), padx=(3, 0))
-        self.dataAteField = Entry(self.findFrame)
-        self.dataAteField.grid(row=0, column=3, ipadx="5")
+        self.treeResults.column("# 3", anchor=CENTER)
+        self.treeResults.heading("# 3", text="Name")
+
+        # # create DESDE label
+        # self.dataFrom = Label(self.findFrame, text="Desde (AAAA-mm-dd):")
+        # self.dataFrom.grid(row=0, column=0, pady=(3), padx=(3, 0))
+        # self.dataFromField = Entry(self.findFrame)    
+        # self.dataFromField.grid(row=0, column=1, ipadx="5")
+        # # self.dataFromField.bind("<1>", self.openCalendar())
+        
+        # # create ATE label
+        # self.dataAte = Label(self.findFrame, text="Até (AAAA-mm-dd):" )
+        # self.dataAte.grid(row=0, column=2, pady=(3), padx=(3, 0))
+        # self.dataAteField = Entry(self.findFrame)
+        # self.dataAteField.grid(row=0, column=3, ipadx="5")
  
-        self.btnClean = Button(self.findFrame, text="Procurar", width=20, command=self.procurarData)
-        self.btnClean.grid(row=0, column=4, columnspan=2, pady=(3), padx=(3, 0))
+        # self.btnClean = Button(self.findFrame, text="Procurar", width=20, command=self.procurarData)
+        # self.btnClean.grid(row=0, column=4, columnspan=2, pady=(3), padx=(3, 0))
+
+    def reloadTable( self ):
+        
+        i = 0
+
+    def generateColumns( self ):
+        self.selected_month
+        month = self.selected_month.split('-')[0]
+        year = self.selected_month.split('-')[1]
 
     def createCBValues( self ):
-        self.month_cb['values']=(
-            "test",
-            "test23"
-        )
+
+        db = connection.BancoDeDados()
+        db.conecta_db()
+        dateLists = db.getListOfDates()
+        db.desconecta_db()
+
+        self.month_cb['values']=( dateLists )
 
     def procurarData( self ):
         a = 0

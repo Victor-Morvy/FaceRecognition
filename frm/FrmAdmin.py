@@ -103,10 +103,6 @@ class FrmAdmin(tk.Toplevel):
         
         self.updateFoto = False
 
-    def __del__( self ):
-        if hasattr( self, "registraFoto" ):
-            self.registraFoto.destroy
-
     def tirarFoto( self ):
         self.updateFoto = True
 
