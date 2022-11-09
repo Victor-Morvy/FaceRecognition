@@ -39,43 +39,25 @@ class FrmRelatorio( tk.Toplevel ):
         db.desconecta_db()
 
         self.month_cb['values']=( dateLists )
-        # prevent typing a value
         self.month_cb['state'] = 'readonly'
-        # self.month_cb.grid( row=1, column=1 )
         self.month_cb.pack()
 
         self.treeResults = ttk.Treeview(self, column=("c1", "c2"), show='headings', height=28 )
         self.treeResults.column("# 1", anchor=CENTER)
-        self.treeResults.heading("# 1", text="RA")
+        self.treeResults.heading("# 1", text="")
         self.treeResults.column("# 2", anchor=CENTER)
-        self.treeResults.heading("# 2", text="Name")
+        self.treeResults.heading("# 2", text="")
 
         self.treeResults.pack()
 
         self.treeResults.configure(columns=("c2", "c3", "c4"))
         
         self.treeResults.column("# 3", anchor=CENTER)
-        self.treeResults.heading("# 3", text="Name")
+        self.treeResults.heading("# 3", text="")
 
         self.reloadTable()
 
-        # # create DESDE label
-        # self.dataFrom = Label(self.findFrame, text="Desde (AAAA-mm-dd):")
-        # self.dataFrom.grid(row=0, column=0, pady=(3), padx=(3, 0))
-        # self.dataFromField = Entry(self.findFrame)    
-        # self.dataFromField.grid(row=0, column=1, ipadx="5")
-        # # self.dataFromField.bind("<1>", self.openCalendar())
-        
-        # # create ATE label
-        # self.dataAte = Label(self.findFrame, text="Até (AAAA-mm-dd):" )
-        # self.dataAte.grid(row=0, column=2, pady=(3), padx=(3, 0))
-        # self.dataAteField = Entry(self.findFrame)
-        # self.dataAteField.grid(row=0, column=3, ipadx="5")
- 
-        # self.btnClean = Button(self.findFrame, text="Procurar", width=20, command=self.procurarData)
-        # self.btnClean.grid(row=0, column=4, columnspan=2, pady=(3), padx=(3, 0))
     def on_field_change(self, index, value, op):
-        # print (f"combobox updated to {value}")
         self.reloadTable()
         
 
