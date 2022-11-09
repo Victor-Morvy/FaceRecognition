@@ -31,12 +31,12 @@ class FrmRelatorio( tk.Toplevel ):
         self.selected_month = tk.StringVar()
         self.month_cb = ttk.Combobox(self, textvariable=self.selected_month)
 
-        
-
         db = connection.BancoDeDados()
         db.conecta_db()
         dateLists = db.getListOfDates()
         db.desconecta_db()
+
+        
 
         self.month_cb['values']=( dateLists )
         # prevent typing a value
@@ -74,13 +74,24 @@ class FrmRelatorio( tk.Toplevel ):
         # self.btnClean.grid(row=0, column=4, columnspan=2, pady=(3), padx=(3, 0))
 
     def reloadTable( self ):
-        
-        i = 0
+        columns = self.generateTableData()
+        #TODO : for each column, create table columns, and then create rows
+        print( columns )
 
-    def generateColumns( self ):
-        self.selected_month
+
+    def generateTableData( self ):
         month = self.selected_month.split('-')[0]
         year = self.selected_month.split('-')[1]
+        lastDay = calendar.monthrange( int( year ), int( month ) )[1]
+        dateFrom = year + "-" + month + "-" + "01"
+        dateTo = year + "-" + month + "-" + str( lastDay )
+
+        db = connection.BancoDeDados()
+        db.conecta_db()
+        dateLists = db.getPresencaBetweenDates( dateFrom, dateTo )
+        db.desconecta_db()
+        
+        return dateLists
 
     def createCBValues( self ):
 
