@@ -127,7 +127,8 @@ class VideoWidget( Label ):
                 except:
                     None
 
-                self.encodeVideo = fr.face_encodings( img2, model = "large" )
+                if img2:
+                    self.encodeVideo = fr.face_encodings( img2, model = "large" )
                 
                 try:
 

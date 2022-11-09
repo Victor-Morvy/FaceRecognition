@@ -110,6 +110,26 @@ class BancoDeDados():
             SELECT * FROM presenca 
             WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
             GROUP BY data_presenca, ra_aluno
+            ORDER BY ra_aluno ASC
+        """)
+        # print( res.fetchall() )
+        return res.fetchall()
+    
+    def getAlunosByDays( self, fromDate, toDate ):
+        res = self.conn.execute(f"""
+            SELECT * FROM presenca 
+            WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+            GROUP BY ra_aluno
+            ORDER BY ra_aluno ASC
+        """)
+        # print( res.fetchall() )
+        return res.fetchall()
+
+    def getDaysOfMonth( self, fromDate, toDate ):
+        res = self.conn.execute(f"""
+            SELECT * FROM presenca 
+            WHERE strftime('%s', data_presenca) BETWEEN strftime('%s', '{fromDate}') AND strftime('%s', '{toDate}' )
+            GROUP BY data_presenca
         """)
         # print( res.fetchall() )
         return res.fetchall()

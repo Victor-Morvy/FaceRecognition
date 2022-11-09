@@ -16,9 +16,10 @@ class FrmRelatorio( tk.Toplevel ):
 
         self.month = datetime.datetime.now().month
 
-        self.geometry('1024x852')
-        self.maxsize( 1024, 852 )
-        self.minsize( 1024, 852)
+        y = 635
+        self.geometry('1024x' + str(y))
+        self.maxsize( 1024, y )
+        self.minsize( 1024, y)
         self.title('Relatório de Presença')
 
         self.labelJump2 = Label(self, text="Escola a data:")
@@ -29,6 +30,7 @@ class FrmRelatorio( tk.Toplevel ):
 
         # create a combobox
         self.selected_month = tk.StringVar()
+        self.selected_month.trace('w',self.on_field_change)
         self.month_cb = ttk.Combobox(self, textvariable=self.selected_month)
 
         db = connection.BancoDeDados()
@@ -36,15 +38,13 @@ class FrmRelatorio( tk.Toplevel ):
         dateLists = db.getListOfDates()
         db.desconecta_db()
 
-        
-
         self.month_cb['values']=( dateLists )
         # prevent typing a value
         self.month_cb['state'] = 'readonly'
         # self.month_cb.grid( row=1, column=1 )
         self.month_cb.pack()
 
-        self.treeResults = ttk.Treeview(self, column=("c1", "c2"), show='headings', height=38)
+        self.treeResults = ttk.Treeview(self, column=("c1", "c2"), show='headings', height=28 )
         self.treeResults.column("# 1", anchor=CENTER)
         self.treeResults.heading("# 1", text="RA")
         self.treeResults.column("# 2", anchor=CENTER)
@@ -56,6 +56,8 @@ class FrmRelatorio( tk.Toplevel ):
         
         self.treeResults.column("# 3", anchor=CENTER)
         self.treeResults.heading("# 3", text="Name")
+
+        self.reloadTable()
 
         # # create DESDE label
         # self.dataFrom = Label(self.findFrame, text="Desde (AAAA-mm-dd):")
@@ -72,16 +74,58 @@ class FrmRelatorio( tk.Toplevel ):
  
         # self.btnClean = Button(self.findFrame, text="Procurar", width=20, command=self.procurarData)
         # self.btnClean.grid(row=0, column=4, columnspan=2, pady=(3), padx=(3, 0))
+    def on_field_change(self, index, value, op):
+        # print (f"combobox updated to {value}")
+        self.reloadTable()
+        
 
     def reloadTable( self ):
-        columns = self.generateTableData()
-        #TODO : for each column, create table columns, and then create rows
-        print( columns )
+        columns, days, alunos = self.generateTableData()
+
+        cols = ["c0"]
+
+        i = 1
+        for day in days:
+            cols.append( "c" + str(i))
+            i += 1
+        
+        self.treeResults.configure(columns=cols)
+        
+        i = 2
+        for day in days:
+            self.treeResults.column("# " + str( i ), anchor=CENTER)
+            self.treeResults.heading("# "+ str( i ), text=day[1])
+            i += 1
+
+        i = 0
+
+        try:
+            self.treeResults.delete(*self.treeResults.get_children())
+        except:
+            None
+
+        alunoVec = []
+        for aluno in alunos:
+            alunoVec.append( aluno[0] )
+
+            for day in days:
+                if day[0] == aluno[0]:
+                    alunoVec.append( "presente" )
+                else:
+                    alunoVec.append( "faltou" )
+            
+            self.treeResults.insert("",'end',text="L"+str(i),values=alunoVec)
+            i += 1
+            alunoVec = []
 
 
     def generateTableData( self ):
-        month = self.selected_month.split('-')[0]
-        year = self.selected_month.split('-')[1]
+        selected = self.selected_month.get()
+        if len(selected) == 0:
+            return ()
+        print( "Blue " + str(len(selected) ) )
+        month = selected.split('-')[1]
+        year = selected.split('-')[0]
         lastDay = calendar.monthrange( int( year ), int( month ) )[1]
         dateFrom = year + "-" + month + "-" + "01"
         dateTo = year + "-" + month + "-" + str( lastDay )
@@ -89,9 +133,11 @@ class FrmRelatorio( tk.Toplevel ):
         db = connection.BancoDeDados()
         db.conecta_db()
         dateLists = db.getPresencaBetweenDates( dateFrom, dateTo )
+        daysList = db.getDaysOfMonth( dateFrom, dateTo )
+        alunos = db.getAlunosByDays( dateFrom, dateTo )
         db.desconecta_db()
         
-        return dateLists
+        return dateLists, daysList, alunos
 
     def createCBValues( self ):
 
