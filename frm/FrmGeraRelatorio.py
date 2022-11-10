@@ -42,20 +42,37 @@ class FrmRelatorio( tk.Toplevel ):
         self.month_cb['state'] = 'readonly'
         self.month_cb.pack()
 
-        self.treeResults = ttk.Treeview(self, column=("c1", "c2"), show='headings', height=28 )
+        self.treeResults = ttk.Treeview(self, column=("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10"), show='headings', height=28 )
         self.treeResults.column("# 1", anchor=CENTER)
         self.treeResults.heading("# 1", text="")
         self.treeResults.column("# 2", anchor=CENTER)
         self.treeResults.heading("# 2", text="")
+        self.treeResults.column("# 3", anchor=CENTER)
+        self.treeResults.heading("# 3", text="")
+        self.treeResults.column("# 4", anchor=CENTER)
+        self.treeResults.heading("# 4", text="")
+        self.treeResults.column("# 5", anchor=CENTER)
+        self.treeResults.heading("# 5", text="")
+        self.treeResults.column("# 6", anchor=CENTER)
+        self.treeResults.heading("# 6", text="")
+        self.treeResults.column("# 7", anchor=CENTER)
+        self.treeResults.heading("# 7", text="")
+        self.treeResults.column("# 8", anchor=CENTER)
+        self.treeResults.heading("# 8", text="")
+        self.treeResults.column("# 9", anchor=CENTER)
+        self.treeResults.heading("# 9", text="")
+        self.treeResults.column("# 10", anchor=CENTER)
+        self.treeResults.heading("# 10", text="")
+        
 
-        vsb = ttk.Scrollbar(self, orient="horizontal", command=self.treeResults.xview)
-        vsb.place(x=3, y=200+255, width=200+222 - 105)
+        self.vsb = ttk.Scrollbar(self, orient="horizontal", command=self.treeResults.xview)
+        self.vsb.place( y=615, width=1022)
 
-        self.treeResults.configure(yscrollcommand=vsb.set)
+        self.treeResults.configure(xscrollcommand=self.vsb.set)
 
         self.treeResults.pack( fill='x' )
 
-        self.treeResults.configure(columns=("c2", "c3", "c4"))
+        self.treeResults.configure(columns=("c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11"))
         
         self.treeResults.column("# 3", anchor=CENTER)
         self.treeResults.heading("# 3", text="")
@@ -78,10 +95,14 @@ class FrmRelatorio( tk.Toplevel ):
         
         self.treeResults.configure(columns=cols)
         
+        columWidth = 75
+        self.treeResults.column("# " + str( 1 ), anchor='nw', width=columWidth, stretch=False)
         i = 2
         for day in days:
-            self.treeResults.column("# " + str( i ), anchor='ne', width=125, stretch=False)
-            self.treeResults.heading("# "+ str( i ), text=day[1])
+            self.treeResults.column("# " + str( i ), anchor='nw', width=columWidth, stretch=False)
+            anoMesDia = day[1].split('-')
+            patternDay = anoMesDia[2] + "/" + anoMesDia[1] + "/" + anoMesDia[0]
+            self.treeResults.heading("# "+ str( i ), text=patternDay)
             i += 1
 
         i = 0
@@ -90,7 +111,7 @@ class FrmRelatorio( tk.Toplevel ):
             self.treeResults.delete(*self.treeResults.get_children())
         except:
             None
-
+        
         alunoVec = []
         for aluno in alunos:
             alunoVec.append( aluno[0] )
@@ -104,7 +125,6 @@ class FrmRelatorio( tk.Toplevel ):
             self.treeResults.insert("",'end',text="L"+str(i),values=alunoVec)
             i += 1
             alunoVec = []
-
 
     def generateTableData( self ):
         selected = self.selected_month.get()
@@ -134,22 +154,13 @@ class FrmRelatorio( tk.Toplevel ):
 
         self.month_cb['values']=( dateLists )
 
-    def procurarData( self ):
-        a = 0
-        validateFrom = self.validateDate( self.dataFromField.get() )
-        validateAte = self.validateDate( self.dataAteField.get() )
-        print( "validateFrom " + str(validateFrom) + " validateAte " + str(validateAte) )
-
     def validateDate( self, input ):
-        datePattern = r'(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])'
         format = "%Y-%m-%d"
         res = False
         try:
             res = bool(datetime.datetime.strptime(input, format))
         except ValueError:
             res = False
-        # ret = re.search( datePattern, input )
-        # print (ret.group())
         return res
 
     def myLoop( self ):

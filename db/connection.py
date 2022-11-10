@@ -134,8 +134,7 @@ class BancoDeDados():
         # print( res.fetchall() )
         return res.fetchall()
 
-    def addPresenca( self, ra ) :
-        dateNow = datetime.today().strftime('%Y-%m-%d')
+    def addPresenca( self, ra, dateNow=datetime.today().strftime('%Y-%m-%d') ) :
         self.conn.execute(f"INSERT INTO presenca(ra_aluno, data_presenca) values('{ra}', '{dateNow}')")
         try:
             self.conn.commit()

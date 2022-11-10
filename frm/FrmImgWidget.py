@@ -137,14 +137,18 @@ class VideoWidget( Label ):
                         
                         hold = False
                         achou = fr.compare_faces(self.encodeList, self.encodeVideo[0])
+                        count = 0
                         for item in achou:
                             if item:
                                 hold = True
-                                break
+                                count += 1
+                            
                             i += 1
 
-                        if hold:
+                        if hold and count == 1:
                             self.faceStatus = FaceStatus.ACHOU
+                        else:
+                            self.faceStatus = FaceStatus.PROCURANDO
 
                     elif len(self.encodeVideo) > 1 :
                         self.faceStatus = FaceStatus.ENCONTROU_MAIS_DE_UM_ROSTO
