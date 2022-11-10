@@ -132,11 +132,6 @@ class FrmAdmin(tk.Toplevel):
         image.save( self.tmpImage )
 
     def myLoop(self):
-        # db_ = db.connection.BancoDeDados()
-        # db_.conecta_db()
-        # db_.getPresencaBetweenDates( "2022-10-28", "2022-10-31")
-        # db_.desconecta_db()
-
         if( self.showTmpImage != self.lastShowTmpImage ):
             if( self.showTmpImage ):
                 self.imageUrl = self.tmpImage

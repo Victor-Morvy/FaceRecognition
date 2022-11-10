@@ -125,16 +125,15 @@ def threaded_update():
 
       if( existWindow() ):
          window.myLoop()
+      
       if( "video_widget" in globals() and video_widget ):
          video_widget.myLoop()
          now = time.time()
          dt = now - _start_time
          _start_time = now
 
-         # video_widget.myLoop()
-         
          if 'window' in globals() and hasattr(window, "close_window") and window.close_window:
-            window.close_window = False
+            window.close_window = False   
             window.destroy()
             video_widget.setRole( imgWidget.VideoRole.RECOGNIZE_PERSON )
             video_widget.getImageSets()

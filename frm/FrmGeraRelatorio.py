@@ -18,7 +18,7 @@ class FrmRelatorio( tk.Toplevel ):
 
         y = 635
         self.geometry('1024x' + str(y))
-        self.maxsize( 1024, y )
+        self.maxsize( 2024, y )
         self.minsize( 1024, y)
         self.title('Relatório de Presença')
 
@@ -48,7 +48,12 @@ class FrmRelatorio( tk.Toplevel ):
         self.treeResults.column("# 2", anchor=CENTER)
         self.treeResults.heading("# 2", text="")
 
-        self.treeResults.pack()
+        vsb = ttk.Scrollbar(self, orient="horizontal", command=self.treeResults.xview)
+        vsb.place(x=3, y=200+255, width=200+222 - 105)
+
+        self.treeResults.configure(yscrollcommand=vsb.set)
+
+        self.treeResults.pack( fill='x' )
 
         self.treeResults.configure(columns=("c2", "c3", "c4"))
         
@@ -75,7 +80,7 @@ class FrmRelatorio( tk.Toplevel ):
         
         i = 2
         for day in days:
-            self.treeResults.column("# " + str( i ), anchor=CENTER)
+            self.treeResults.column("# " + str( i ), anchor='ne', width=125, stretch=False)
             self.treeResults.heading("# "+ str( i ), text=day[1])
             i += 1
 
@@ -104,8 +109,7 @@ class FrmRelatorio( tk.Toplevel ):
     def generateTableData( self ):
         selected = self.selected_month.get()
         if len(selected) == 0:
-            return ()
-        print( "Blue " + str(len(selected) ) )
+            return (), (), ()
         month = selected.split('-')[1]
         year = selected.split('-')[0]
         lastDay = calendar.monthrange( int( year ), int( month ) )[1]
