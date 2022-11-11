@@ -45,12 +45,9 @@ def loadImageH( file, maxHeight = -1 ):
     else:
         finalHeight = maxHeight
 
-
     tmpPercent = finalHeight / image.height
     newHeight = finalHeight
     newWidth = tmpPercent * newWidth
-
-    # print( "tmpPercent " + str(tmpPercent))
 
     image = image.resize((int(newWidth), int(newHeight)))
     img = ImageTk.PhotoImage(image)

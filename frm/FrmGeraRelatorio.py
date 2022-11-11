@@ -86,13 +86,6 @@ class FrmRelatorio( tk.Toplevel ):
         self.reloadTable()
 
     def toExcel(self):
-        a = 0
-        placeToSave="./out.xlsx"
-
-        # print(len(self.columns_tables))
-        # print(len(self.index_tables))
-        # print(len(self.data_tables))
-
         self.xmlContent = pd.DataFrame( self.data_tables, index=self.index_tables, columns=self.columns_tables )
         
         savePath = tkinter.filedialog.asksaveasfile( mode="w", defaultextension=".xlsx", filetypes=[("Excel File", ".xlsx")])
@@ -100,7 +93,7 @@ class FrmRelatorio( tk.Toplevel ):
             return
 
         savePath = savePath.name
-        
+
         print( "SavePath " + savePath )
             
         self.xmlContent.to_excel(savePath)
