@@ -9,6 +9,9 @@ import re
 import calendar
 from tkcalendar import Calendar, DateEntry
 import db.connection as connection
+import pandas as pd
+import tkinter.filedialog
+import openpyxl
 
 class FrmRelatorio( tk.Toplevel ):
     def __init__(self, parent):
@@ -18,7 +21,7 @@ class FrmRelatorio( tk.Toplevel ):
 
         y = 635
         self.geometry('1024x' + str(y))
-        self.maxsize( 2024, y )
+        self.maxsize( 1024, y )
         self.minsize( 1024, y)
         self.title('Relatório de Presença')
 
@@ -31,7 +34,7 @@ class FrmRelatorio( tk.Toplevel ):
         # create a combobox
         self.selected_month = tk.StringVar()
         self.selected_month.trace('w',self.on_field_change)
-        self.month_cb = ttk.Combobox(self, textvariable=self.selected_month)
+        self.month_cb = ttk.Combobox(self.findFrame, textvariable=self.selected_month)
 
         db = connection.BancoDeDados()
         db.conecta_db()
@@ -41,6 +44,8 @@ class FrmRelatorio( tk.Toplevel ):
         self.month_cb['values']=( dateLists )
         self.month_cb['state'] = 'readonly'
         self.month_cb.pack()
+
+        self.btn_print = ttk.Button(self.findFrame, text="Gerar Excel", command=self.toExcel).pack()
 
         self.treeResults = ttk.Treeview(self, column=("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10"), show='headings', height=28 )
         self.treeResults.column("# 1", anchor=CENTER)
@@ -64,11 +69,12 @@ class FrmRelatorio( tk.Toplevel ):
         self.treeResults.column("# 10", anchor=CENTER)
         self.treeResults.heading("# 10", text="")
         
-
+        self.vsby = ttk.Scrollbar(self, orient="vertical", command=self.treeResults.yview)
         self.vsb = ttk.Scrollbar(self, orient="horizontal", command=self.treeResults.xview)
         self.vsb.place( y=615, width=1022)
+        self.vsby.place( x=1008, y=45, width=18, height=570)
 
-        self.treeResults.configure(xscrollcommand=self.vsb.set)
+        self.treeResults.configure(xscrollcommand=self.vsb.set, yscrollcommand=self.vsby.set)
 
         self.treeResults.pack( fill='x' )
 
@@ -78,6 +84,27 @@ class FrmRelatorio( tk.Toplevel ):
         self.treeResults.heading("# 3", text="")
 
         self.reloadTable()
+
+    def toExcel(self):
+        a = 0
+        placeToSave="./out.xlsx"
+
+        # print(len(self.columns_tables))
+        # print(len(self.index_tables))
+        # print(len(self.data_tables))
+
+        self.xmlContent = pd.DataFrame( self.data_tables, index=self.index_tables, columns=self.columns_tables )
+        
+        savePath = tkinter.filedialog.asksaveasfile( mode="w", defaultextension=".xlsx", filetypes=[("Excel File", ".xlsx")])
+        if( savePath is None):
+            return
+
+        savePath = savePath.name
+        
+        print( "SavePath " + savePath )
+            
+        self.xmlContent.to_excel(savePath)
+
 
     def on_field_change(self, index, value, op):
         self.reloadTable()
@@ -98,11 +125,19 @@ class FrmRelatorio( tk.Toplevel ):
         columWidth = 75
         self.treeResults.column("# " + str( 1 ), anchor='nw', width=columWidth, stretch=False)
         i = 2
+
+        self.columns_tables = []
+        self.index_tables = []
+        self.data_tables = []
+
+        # self.columns_tables.append("")
         for day in days:
             self.treeResults.column("# " + str( i ), anchor='nw', width=columWidth, stretch=False)
             anoMesDia = day[1].split('-')
             patternDay = anoMesDia[2] + "/" + anoMesDia[1] + "/" + anoMesDia[0]
+            self.columns_tables.append(patternDay)
             self.treeResults.heading("# "+ str( i ), text=patternDay)
+
             i += 1
 
         i = 0
@@ -115,6 +150,7 @@ class FrmRelatorio( tk.Toplevel ):
         alunoVec = []
         for aluno in alunos:
             alunoVec.append( aluno[0] )
+            self.index_tables.append( aluno[ 0 ] )
 
             for day in days:
                 if day[0] == aluno[0]:
@@ -124,6 +160,8 @@ class FrmRelatorio( tk.Toplevel ):
             
             self.treeResults.insert("",'end',text="L"+str(i),values=alunoVec)
             i += 1
+            alunoVec.pop(0)
+            self.data_tables.append(alunoVec)
             alunoVec = []
 
     def generateTableData( self ):

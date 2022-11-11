@@ -5,3 +5,7 @@ mediapipe
 dlib
 face_recognition
 tkcalendar
+aspose-cells
+pandas
+xlwt
+openpyxl
