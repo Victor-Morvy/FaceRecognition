@@ -100,9 +100,6 @@ def existVideoWidget():
    
    return False
 
-def donothing():
-   x = 0
-
 def threaded_update():  
    global runThread
    global window
@@ -148,10 +145,11 @@ def threaded_update():
             if( len(faces) == 1 ):                     
                if window.updateFoto:
                   for (x, y, w, h) in faces:
-                     cv2.rectangle(video_widget.getVideoFrame(), (x, y), (x+w, y+h), 
-                                    (0, 0, 255), 2)
+                     offset = 50
+                     # cv2.rectangle(video_widget.getVideoFrame(), (x-offset, y-offset), (x+w+offset, y+h+offset), 
+                     #                (0, 0, 255), 2)
                         
-                     faces = video_widget.getVideoFrame()[y:y + h, x:x + w]
+                     faces = video_widget.getVideoFrame()[y:y + h +offset, x:x + w]
                      fileName = "./tmpFoto.png"
                      cv2.imwrite(fileName, faces)
                      print( "Take Foto" )

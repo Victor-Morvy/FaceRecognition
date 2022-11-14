@@ -127,9 +127,6 @@ class VideoWidget( Label ):
                 except:
                     None
 
-                # if img2:
-                    
-                
                 try:
                     self.encodeVideo = fr.face_encodings( img2, model = "large" )
                     i = 0
@@ -142,8 +139,9 @@ class VideoWidget( Label ):
                             if item:
                                 hold = True
                                 count += 1
-                            
-                            i += 1
+                                
+                            if( not hold ):
+                                i += 1
 
                         if hold and count == 1:
                             self.faceStatus = FaceStatus.ACHOU
@@ -161,17 +159,25 @@ class VideoWidget( Label ):
                         self.times_to_detect.append(1)
                     
                     if( len(self.times_to_detect) >= 5 ):
+                        
                         if len(self.times_to_detect) == 5 :
                             ownDB = db.connection.BancoDeDados()
+                            print(" Achou ? ")
                             ownDB.conecta_db()
+                            print(" Achou ? " + str(i))
+                            print( self.alunosToCompare )
                             ownDB.addPresenca(self.alunosToCompare[i][0])
+                            print(" Achou ? ")
                             ownDB.desconecta_db()
+                            print(" Achou ? ")
+
                         self.faceStatus = FaceStatus.MATCH_FOTO
                         if( len(self.alunosToCompare) == 0 ): 
                             return
                         self._alunoRertorno.ra_aluno = self.alunosToCompare[i][0]
                         self._alunoRertorno.nome_aluno = self.alunosToCompare[i][1]
                 except:
+                    print( "Caiu no except ")
                     self.faceStatus = FaceStatus.PROCURANDO
                     self.times_to_detect = []
                 
