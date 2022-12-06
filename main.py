@@ -20,6 +20,8 @@ import time
 import cv2
 
 
+#Correção do BUG do TIKINTER 
+#Força o encerramento de todas as threads de forma recursiva 
 def _async_raise(tid, exctype):
     '''Raises an exception in the threads with id tid'''
     if not inspect.isclass(exctype):
@@ -34,6 +36,7 @@ def _async_raise(tid, exctype):
         ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid), None)
         raise SystemError("PyThreadState_SetAsyncExc failed")
 
+#Força o encerramento de todas as threads de forma recursiva 
 class ThreadWithExc(threading.Thread):
     '''A thread class that supports raising an exception in the thread from
        another thread.
@@ -89,16 +92,19 @@ class ThreadWithExc(threading.Thread):
         thread represented by this instance.
         """
         _async_raise( self._get_my_tid(), exctype )
-
+      
+#Testa para ver se existe o objeto windows nas variaveis globais do python
 def existWindow():
    if 'window' in globals():
       return True
 
+#Testa para ver se existe o objeto video_widget nas variaveis globais do python
+#Se existir no global retorna true se não false
 def existVideoWidget():
    if 'video_widget' in globals():
-      return True
-   
+      return True 
    return False
+
 
 def threaded_update():  
    global runThread
